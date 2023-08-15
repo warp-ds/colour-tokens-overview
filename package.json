@@ -12,5 +12,11 @@
     "@sveltejs/vite-plugin-svelte": "^2.4.2",
     "svelte": "^4.0.5",
     "vite": "^4.4.5"
+  },
+  "dependencies": {
+    "@warp-ds/component-classes": "^1.0.0-alpha.116",
+    "@warp-ds/elements": "^1.0.0-alpha.27",
+    "@warp-ds/uno": "^1.0.0-alpha.49",
+    "unocss": "^0.53.1"
   }
 }
