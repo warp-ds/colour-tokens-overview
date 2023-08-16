@@ -1,5 +1,22 @@
 <script>
   import "@warp-ds/elements";
+ 
+  // Import variabels data from Figma
+  import rawPrimitive from "../data/primitive-tailwind.js";
+  import rawTokens from "../data/tokens-tailwind.js";
+  
+  // Wrap the rawData in curly braces
+  const wrappedPrimitive = `{${rawPrimitive}}`;
+  const wrappedTokens = `{${rawTokens}}`;
+  
+  // Use eval to convert the string to an object
+  const primitive = eval("(" + wrappedPrimitive + ")");
+  const tokens = eval("(" + wrappedTokens + ")");
+
+  // check that it works
+  // console.log(primitive.FINN.colors); // This should now work
+  // console.log(tokens.Light.colors); // This should now work
+
 </script>
 
 <main>
