@@ -198,18 +198,6 @@ Light: {
     'semantic-colour-text-positive': 'var(--color-green-600, #059e6f)',
     'semantic-colour-text-subtle': 'var(--color-gray-500, #71717a)',
   },
-  spacing: {
-    'semantic-size-radius-md': 'var(--space-space-8, 0.5rem)',
-    'semantic-size-radius-sm': 'var(--space-space-4, 0.25rem)',
-    'semantic-size-padding-12': 'var(--space-space-12, 0.75rem)',
-    'semantic-size-padding-h-16': 'var(--space-space-16, 1rem)',
-    'semantic-size-radius-lg': 'var(--space-space-16, 1rem)',
-    'semantic-size-radius-full': 'var(--space-space-1000, 62.5rem)',
-    'semantic-size-padding-20': 'var(--space-space-20, 1.25rem)',
-    'semantic-size-radius-xs': 'var(--space-space-2, 0.125rem)',
-    'components-alert-alert-width': 'var(--page-width, 90rem)',
-    'semantic-size-radius-none': '0rem',
-  },
 },
 Dark: {
   colors: {
@@ -409,18 +397,6 @@ Dark: {
     'semantic-colour-text-placeholder': 'var(--color-bluegray-500, #6f7d90)',
     'semantic-colour-text-positive': 'var(--color-green-500, #18c884)',
     'semantic-colour-text-subtle': 'var(--color-gray-100, #f4f4f5)',
-  },
-  spacing: {
-    'semantic-size-radius-md': 'var(--space-space-8, 0.5rem)',
-    'semantic-size-radius-sm': 'var(--space-space-4, 0.25rem)',
-    'semantic-size-padding-12': 'var(--space-space-12, 0.75rem)',
-    'semantic-size-padding-h-16': 'var(--space-space-16, 1rem)',
-    'semantic-size-radius-lg': 'var(--space-space-16, 1rem)',
-    'semantic-size-radius-full': 'var(--space-space-1000, 62.5rem)',
-    'semantic-size-padding-20': 'var(--space-space-20, 1.25rem)',
-    'semantic-size-radius-xs': 'var(--space-space-2, 0.125rem)',
-    'components-alert-alert-width': 'var(--page-width, 90rem)',
-    'semantic-size-radius-none': '0rem',
   },
 },
 `;
