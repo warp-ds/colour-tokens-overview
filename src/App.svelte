@@ -1,108 +1,148 @@
 <script>
   import "@warp-ds/elements";
+  import { onMount } from "svelte";
+  import jsyaml from "js-yaml";
 
-  // Import variables data from Figma
-  import rawPrimitive from "../data/primitive-tailwind.js";
-  import rawTokens from "../data/tokens-tailwind.js";
+  // Declare reactive variables to hold the parsed data
+  let colors = null;
+  let tokens = null;
 
-  // Wrap the rawData in curly braces
-  const wrappedPrimitive = `{${rawPrimitive}}`;
-  const wrappedTokens = `{${rawTokens}}`;
+  // Read the data from YAML files online
+  onMount(async () => {
+    // Fetch and parse the colors YAML
+    const colorsResponse = await fetch(
+      "https://raw.githubusercontent.com/warp-ds/css/alpha/tokens/finn.no/colors.yml"
+    );
+    const colorsYaml = await colorsResponse.text();
+    colors = jsyaml.load(colorsYaml);
 
-  // Use eval to convert the string to an object
-  const primitive = eval("(" + wrappedPrimitive + ")");
-  const tokens = eval("(" + wrappedTokens + ")");
+    // Fetch and parse the tokens YAML
+    const tokensResponse = await fetch(
+      "https://raw.githubusercontent.com/warp-ds/css/alpha/tokens/finn.no/semantic.yml"
+    );
+    const tokensYaml = await tokensResponse.text();
+    tokens = jsyaml.load(tokensYaml);
+  });
 
-  // Check that it works
-  // console.log(primitive.FINN.colors); // This should now work
-  // console.log(tokens.Light.colors); // This should now work
+  // Extract colour values
+  function getColorForToken(token) {
+    if (typeof token !== 'string') {
+        console.warn('Received non-string token:', token);
+        return null;
+    }
 
-  // Transform tokens object into desired structure
-  const transformValue = (value) => {
-    const aliasMatch = value.match(/--(.*),/);
-    const hexMatch = value.match(/, ([^)]+)\)/);
+    if (!token || !colors) return null;
 
-    return {
-      alias: aliasMatch ? aliasMatch[1] : null,
-      hexFINN: hexMatch ? hexMatch[1] : null,
-    };
-  };
+    let parts = token.split("-");
+    let colorName = parts[0];
 
-  const transformedTokens = {
-    Light: {},
-    Dark: {},
-  };
+    // Direct color value
+    if (colors[colorName] && typeof colors[colorName] === "string") {
+      return colors[colorName];
+    }
 
-  // Transform Light colors
-  for (let key in tokens.Light.colors) {
-    transformedTokens.Light[key] = transformValue(tokens.Light.colors[key]);
+    // Color shades
+    if (parts.length === 1) {
+      return colors[colorName] && colors[colorName]._
+        ? colors[colorName]._
+        : null;
+    }
+
+    let shade = parts[1];
+
+    // Basic shades
+    if (colors[colorName] && typeof colors[colorName][shade] === "string") {
+      return colors[colorName][shade];
+    }
+
+    // Complex shades with variants
+    if (parts.length === 3 && colors[colorName] && colors[colorName][shade]) {
+      let variant = parts[2];
+      return colors[colorName][shade][variant] || null;
+    }
+
+    return null;
   }
 
-  // Transform Dark colors
-  for (let key in tokens.Dark.colors) {
-    transformedTokens.Dark[key] = transformValue(tokens.Dark.colors[key]);
+  // Recursively process all the tokens, no matter how deeply nested they are
+  function computeColorsForTokens(tokenObj) {
+    let computed = {};
+
+    for (let key in tokenObj) {
+      if (typeof tokenObj[key] === 'string') {
+        computed[key] = getColorForToken(tokenObj[key]);
+      } else if (typeof tokenObj[key] === 'object') {
+        computed[key] = computeColorsForTokens(tokenObj[key]);  // Recursively compute colors for nested objects
+      }
+    }
+
+    return computed;
   }
 
-  console.log("Primitive variables");
-  console.log(primitive);
-  console.log("Tokens variables");
-  console.log(transformedTokens);
 
-  const components = [
-    "Alert",
-    "Avatar",
-    "Badge",
-    "Box",
-    "Breadcrumbs",
-    "Broadcast",
-    "Button",
-    "Button group",
-    "Callout",
-    "Card",
-    "Checkbox",
-    "Datepicker",
-    "Expandable",
-    "Help text",
-    "Image placeholder",
-    "Input",
-    "Label",
-    "List",
-    "Modal",
-    "Page indicator",
-    "Pagination",
-    "Pill",
-    "Popover",
-    "Radio",
-    "Select",
-    "Slider",
-    "Spinner",
-    "Star rating",
-    "Step indicator",
-    "Switch (Toggle)",
-    "Tabs",
-    "Toast",
-    "Tooltip",
-  ];
+  let computedTokens = {};
+
+
+  // Compute the actual color values for your semantic tokens
+  $: if (tokens && colors) {
+    computedTokens = computeColorsForTokens(tokens.s.color);
+
+    // Console log
+    console.log(tokens),
+    console.log(colors),
+    console.log(computedTokens)
+  }
+
+
+  // OLD
+
+  const components = ["Alert", "Avatar", "Badge", "Box"];
 </script>
 
 <main>
   <h1 class="my-8 text-l">WARP components and tokens</h1>
 
-  <div class="grid my-24 gap-24 grid-cols-1 md:grid-cols-3">
+  <div class="grid my-24 gap-24 grid-cols-1 md:grid-cols-4">
     <div class="flex-initial">
       <h2 class="text-m">Components</h2>
       {#each components as component}
-        <div class="tokenitem s-bg-default my-8 border s-border-default p-8 rounded-8">
+        <div
+          class="tokenitem flex items-center my-8 border s-border-default rounded-8"
+        >
+          <div class="colordot w-16 h-16 m-8 rounded-8" />
           {component}
         </div>
       {/each}
     </div>
     <div class="s-bg-positive-default">
-      <h2 class="text-m">Component tokens</h2>
-
-      <w-card clickable="">
-        <div class="m-20">Clickable</div>
-      </w-card>
+      {#if tokens}
+        <div>
+          <h2>Tokens:</h2>
+          <pre>{JSON.stringify(tokens, null, 2)}</pre>
+        </div>
+      {:else}
+        <p>Loading...</p>
+      {/if}
+    </div>
+    <div>
+      {#if colors}
+        <div>
+          <h2>Colors:</h2>
+          <pre>{JSON.stringify(colors, null, 2)}</pre>
+        </div>
+      {:else}
+        <p>Loading...</p>
+      {/if}
+    </div>
+    <div>
+      {#if colors && tokens}
+        <div>
+          <h2>Computed Tokens:</h2>
+          <pre>{JSON.stringify(computedTokens, null, 2)}</pre>
+        </div>
+      {:else}
+        <p>Loading...</p>
+      {/if}
     </div>
   </div>
 </main>
@@ -116,7 +156,16 @@
     flex-direction: column;
   }
 
-  tokenitem {
-    background-color: var(--w-s-color-background-hover)
+  .tokenitem {
+    background-color: var(--w-s-color-background-default);
+  }
+
+  .tokenitem:hover {
+    background-color: var(--w-s-color-background-hover);
+    border-color: var(--w-s-color-border-hover);
+  }
+
+  .colordot {
+    background-color: blue;
   }
 </style>
