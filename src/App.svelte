@@ -24,78 +24,64 @@
     tokens = jsyaml.load(tokensYaml);
   });
 
-  // Extract colour values
-  function getColorForToken(token) {
-    if (typeof token !== 'string') {
-        console.warn('Received non-string token:', token);
-        return null;
-    }
+  let allTokens = [];
+  let allColors = [];
+  let tokenColorMapping = {};
 
-    if (!token || !colors) return null;
-
-    let parts = token.split("-");
-    let colorName = parts[0];
-
-    // Direct color value
-    if (colors[colorName] && typeof colors[colorName] === "string") {
-      return colors[colorName];
-    }
-
-    // Color shades
-    if (parts.length === 1) {
-      return colors[colorName] && colors[colorName]._
-        ? colors[colorName]._
-        : null;
-    }
-
-    let shade = parts[1];
-
-    // Basic shades
-    if (colors[colorName] && typeof colors[colorName][shade] === "string") {
-      return colors[colorName][shade];
-    }
-
-    // Complex shades with variants
-    if (parts.length === 3 && colors[colorName] && colors[colorName][shade]) {
-      let variant = parts[2];
-      return colors[colorName][shade][variant] || null;
-    }
-
-    return null;
-  }
-
-  // Recursively process all the tokens, no matter how deeply nested they are
-  function computeColorsForTokens(tokenObj) {
-    let computed = {};
-
+  // Function to flatten the semantic tokens
+  function flattenTokens(prefix, tokenObj) {
     for (let key in tokenObj) {
-      if (typeof tokenObj[key] === 'string') {
-        computed[key] = getColorForToken(tokenObj[key]);
-      } else if (typeof tokenObj[key] === 'object') {
-        computed[key] = computeColorsForTokens(tokenObj[key]);  // Recursively compute colors for nested objects
+      if (typeof tokenObj[key] === "string") {
+        let fullTokenName = prefix ? `${prefix}-${key}` : key;
+
+        // Remove trailing "-_"
+        if (fullTokenName.endsWith("-_")) {
+          fullTokenName = fullTokenName.substring(0, fullTokenName.length - 2);
+        }
+
+        allTokens.push(fullTokenName);
+        tokenColorMapping[fullTokenName] = tokenObj[key];
+      } else if (typeof tokenObj[key] === "object") {
+        flattenTokens(prefix ? `${prefix}-${key}` : key, tokenObj[key]);
       }
     }
-
-    return computed;
   }
 
+  // Function to
+  function populateColors(colorObj) {
+    for (let key in colorObj) {
+      if (typeof colorObj[key] === "string") {
+        allColors.push({ name: key, value: colorObj[key] });
+      } else if (typeof colorObj[key] === "object") {
+        for (let shade in colorObj[key]) {
+          if (typeof colorObj[key][shade] === "string") {
+            allColors.push({
+              name: `${key}-${shade}`,
+              value: colorObj[key][shade],
+            });
+          } else {
+            // Handle nested shades if necessary
+            for (let variant in colorObj[key][shade]) {
+              allColors.push({
+                name: `${key}-${shade}-${variant}`,
+                value: colorObj[key][shade][variant],
+              });
+            }
+          }
+        }
+      }
+    }
+  }
 
-  let computedTokens = {};
-
-
-  // Compute the actual color values for your semantic tokens
+  // When data is loaded, flatten and put into
   $: if (tokens && colors) {
-    computedTokens = computeColorsForTokens(tokens.s.color);
-
-    // Console log
-    console.log(tokens),
-    console.log(colors),
-    console.log(computedTokens)
+    flattenTokens("", tokens.s.color);
+    populateColors(colors);
+    // log
+    console.log(tokenColorMapping);
   }
 
-
-  // OLD
-
+  // OLD can soon be deleted
   const components = ["Alert", "Avatar", "Badge", "Box"];
 </script>
 
@@ -115,6 +101,7 @@
       {/each}
     </div>
     <div class="s-bg-positive-default">
+      <h2 class="text-m">Components</h2>
       {#if tokens}
         <div>
           <h2>Tokens:</h2>
@@ -125,6 +112,7 @@
       {/if}
     </div>
     <div>
+      <h2 class="text-m">Components</h2>
       {#if colors}
         <div>
           <h2>Colors:</h2>
@@ -135,10 +123,11 @@
       {/if}
     </div>
     <div>
-      {#if colors && tokens}
+      <h2 class="text-m">Components</h2>
+      {#if tokenColorMapping}
         <div>
-          <h2>Computed Tokens:</h2>
-          <pre>{JSON.stringify(computedTokens, null, 2)}</pre>
+          <h2>Mapping:</h2>
+          <pre>{JSON.stringify(tokenColorMapping, null, 2)}</pre>
         </div>
       {:else}
         <p>Loading...</p>
