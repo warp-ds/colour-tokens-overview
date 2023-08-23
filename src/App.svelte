@@ -23,12 +23,12 @@
     const tokensYaml = await tokensResponse.text();
     tokens = jsyaml.load(tokensYaml);
 
-    console.log("colors:");
-   console.log(typeof(colors));
-    console.log(colors);
-    console.log("tokens:");
-    console.log(typeof(tokens));
-    console.log(tokens);
+    // console.log("colors:");
+    // console.log(typeof colors);
+    // console.log(colors);
+    // console.log("tokens:");
+    // console.log(typeof tokens);
+    // console.log(tokens);
   });
 
   let allTokens = [];
@@ -79,7 +79,7 @@
             value: hexColor,
           },
         ];
-
+    
         tokenColorMapping[fullTokenName] = tokenObj[key];
       } else if (typeof tokenObj[key] === "object") {
         flattenTokens(prefix ? `${prefix}-${key}` : key, tokenObj[key]);
@@ -137,69 +137,72 @@
   $: if (tokens && colors) {
     flattenTokens("", tokens.s.color);
     populateColors(colors);
+    filteredTokens = allTokens;
+    filteredColors = allColors;
     // log
-    console.log("allTokens:");
-    console.log(allTokens);
-    console.log("allColors:");
-    console.log(allColors);
+    // console.log("allTokens:");
+    // console.log(allTokens);
+    // console.log("allColors:");
+    // console.log(allColors);
     // console.log("tokenColorMapping:");
     // console.log(tokenColorMapping);
   }
 
   // Handle selected state
-  let selectedToken = null;
+  let selectedColorOrToken = null;
 
   let filteredTokens = allTokens;
   let filteredColors = allColors;
 
-  // When filtering filter (selectedToken exists or is changed), update filtered arrays
-  $: if (selectedToken) {
+  // Clicking a color, filter
+  function colorClicked(color) {
+    selectedColorOrToken = color;
+
+    console.log("selected color:", color);
+    console.log(color);
+
+    // Get all tokens that reference this color
     filteredTokens = allTokens.filter((token) => {
-      return (
-        token.value === selectedToken.value || token.name === selectedToken.name
-      );
+      return tokenColorMapping[token.name] === color.name;
+      // token.name is for example bluegray-600
     });
+
+    // Only show the clicked color in the colors list
+    filteredColors = [color];
+  }
+
+  // Clicking a token, filter
+  function tokenClicked(token) {
+    selectedColorOrToken = token;
+
+    console.log("selected token:", token);
+    console.log(token);
+
+    // Get the color associated with this token
+    const associatedColorName = tokenColorMapping[token.name];
     filteredColors = allColors.filter((color) => {
-      return (
-        color.value === selectedToken.value || color.name === selectedToken.name
-      );
+      return color.name === associatedColorName;
     });
-  } else {
-    filteredTokens = allTokens;
-    filteredColors = allColors;
-  }
 
-  // when clicking a color
-  function handleTokenClick(tokenName) {
-    if (selectedToken === tokenName) {
-      // If the same token is clicked, reset the filter
-      selectedToken = null;
-    } else {
-      // Otherwise, set the selectedToken to the clicked token's name
-      selectedToken = tokenName;
-    }
-  }
-
-  // when clicking a color
-  function selectColor(color) {
-    selectedToken = color; // Treat selected color as a token for the purpose of filtering
+    // Only show the clicked token in the tokens list
+    filteredTokens = [token];
   }
 
   // when resetting filters
   function resetFilter() {
-    selectedToken = null;
+    selectedColorOrToken = null;
     filteredTokens = allTokens;
     filteredColors = allColors;
   }
 </script>
 
 <main>
-  <h1 class="my-8 text-l">WARP components and tokens</h1>
+  <h1 class="my-8 text-l">Elastic List of Design Tokens</h1>
 
   <div style="height: 100px;" class="my-24">
     <w-button
       on:click={() => resetFilter()}
-      class={selectedToken ? "" : "hidden"}
+      class={selectedColorOrToken ? "" : "hidden"}
       variant="primary">Reset filter</w-button
     >
   </div>
@@ -211,16 +214,16 @@
 
       <!-- Display a loading message if filteredTokens is empty -->
       {#if filteredTokens.length === 0}
-        <p>Loading...</p>
+        <p>No match</p>
       {:else}
         <!-- Iterate through filteredTokens and display each one -->
         {#each filteredTokens as token}
           <div
-            on:click={() => handleTokenClick(token)}
+            on:click={() => tokenClicked(token)}
             class="tokenitem flex items-center my-8 border s-border-default rounded-8"
           >
             <div
-              class="colordot w-16 h-16 m-8 rounded-8"
+              class="colordot w-16 h-32 mr-8"
               style="background-color: {token.value};"
             />
             {token.name}
@@ -230,20 +233,20 @@
     </div>
     <!-- Second column with Primitive colours -->
     <div>
-      <h2 class="text-m">Primitive values</h2>
+      <h2 class="text-m">Colour</h2>
 
       <!-- Display a loading message if filteredColors is empty -->
       {#if filteredColors.length === 0}
-        <p>Loading...</p>
+        <p>No match</p>
       {:else}
         <!-- Iterate through filteredColors and display each one -->
         {#each filteredColors as color}
           <div
-            on:click={() => selectColor(color)}
+            on:click={() => colorClicked(color)}
             class="tokenitem flex items-center my-8 border s-border-default rounded-8"
           >
             <div
-              class="colordot w-16 h-16 m-8 rounded-8"
+              class="colordot w-16 h-32 mr-8"
               style="background-color: {color.value};"
             />
             {color.name}
@@ -272,15 +275,18 @@
 
   .tokenitem {
     background-color: var(--w-s-color-background-default);
+    overflow: hidden;
   }
 
   .tokenitem:hover {
     background-color: var(--w-s-color-background-hover);
     border-color: var(--w-s-color-border-hover);
+    cursor: pointer;
   }
 
   .colordot {
     background-color: white;
+    border-color: var(--w-s-color-border-default);
   }
 
   .hidden {
