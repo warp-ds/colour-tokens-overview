@@ -7,7 +7,7 @@ Currently only contains colours for the FINN Light theme. The colours are loaded
 The project was created by a designers, so don't expect the code to be perfect. 
 
 ## Live web page
-(to be added)
+https://warp-ds.github.io/colour-tokens-overview/
 
 
 ## To run locally

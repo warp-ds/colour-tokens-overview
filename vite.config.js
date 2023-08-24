@@ -6,6 +6,7 @@ import { classes } from '@warp-ds/component-classes/classes';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: '/colour-tokens-overview/',
   plugins: [
     svelte(),
     UnoCSS({
