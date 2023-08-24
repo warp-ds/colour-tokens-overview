@@ -2,6 +2,8 @@
   import "@warp-ds/elements";
   import { onMount } from "svelte";
   import jsyaml from "js-yaml";
+  import { slide, fade } from "svelte/transition";
+  import { quintOut } from "svelte/easing";
 
   // Declare reactive variables to hold the parsed data
   let colors = null;
@@ -23,11 +25,7 @@
     const tokensYaml = await tokensResponse.text();
     tokens = jsyaml.load(tokensYaml);
 
-    // console.log("colors:");
-    // console.log(typeof colors);
     // console.log(colors);
-    // console.log("tokens:");
-    // console.log(typeof tokens);
     // console.log(tokens);
   });
 
@@ -79,7 +77,7 @@
             value: hexColor,
           },
         ];
-    
+
         tokenColorMapping[fullTokenName] = tokenObj[key];
       } else if (typeof tokenObj[key] === "object") {
         flattenTokens(prefix ? `${prefix}-${key}` : key, tokenObj[key]);
@@ -104,6 +102,7 @@
           {
             name: cleanColorName(key),
             value: colorObj[key],
+            count: 0, // default value
           },
         ];
       } else if (typeof colorObj[key] === "object") {
@@ -114,6 +113,7 @@
               {
                 name: cleanColorName(`${key}-${shade}`),
                 value: colorObj[key][shade],
+                count: 0, // default value
               },
             ];
           } else {
@@ -124,6 +124,7 @@
                 {
                   name: cleanColorName(`${key}-${shade}-${variant}`),
                   value: colorObj[key][shade][variant],
+                  count: 0, // default value
                 },
               ];
             }
@@ -131,21 +132,40 @@
         }
       }
     }
+    // when the colours are in place, count how many times they are used by semantic tokens
+    allColors.forEach((color) => {
+      color.count = countTokensForColor(color.name);
+    });
+
+    console.log("allColors", allColors);
   }
 
   // When data is loaded, flatten and put into arrays
   $: if (tokens && colors) {
     flattenTokens("", tokens.s.color);
     populateColors(colors);
+
     filteredTokens = allTokens;
     filteredColors = allColors;
+
     // log
     // console.log("allTokens:");
     // console.log(allTokens);
-    // console.log("allColors:");
-    // console.log(allColors);
+    console.log("allColors:");
+    console.log(allColors);
     // console.log("tokenColorMapping:");
     // console.log(tokenColorMapping);
+  }
+
+  // Count how many semantic tokens refer to a given colour
+  function countTokensForColor(colorName) {
+    let count = 0;
+    for (let token in tokenColorMapping) {
+      if (tokenColorMapping[token] === colorName) {
+        count++;
+      }
+    }
+    return count;
   }
 
   // Handle selected state
@@ -156,10 +176,13 @@
 
   // Clicking a color, filter
   function colorClicked(color) {
-    selectedColorOrToken = color;
+    // If the selected color is clicked again, reset the filters
+    if (selectedColorOrToken === color) {
+      resetFilter();
+      return;
+    }
 
-    console.log("selected color:", color);
-    console.log(color);
+    selectedColorOrToken = color;
 
     // Get all tokens that reference this color
     filteredTokens = allTokens.filter((token) => {
@@ -197,41 +220,20 @@
 </script>
 
 <main>
-  <h1 class="my-8 text-l">Elastic List of Design Tokens</h1>
+  <h1 class="my-8 text-l">Colour Tokens in WARP</h1>
+  <p>
+    Click a colour to see which semantic tokens use that colour. The number next to the colour indicates how many semantic tokens refer to that colour. Currently this site only includes the FINN light theme.
+  </p>
 
-  <div style="height: 100px;" class="my-24">
+  <div style="height: 60px;" class="my-16">
     <w-button
       on:click={() => resetFilter()}
       class={selectedColorOrToken ? "" : "hidden"}
-      variant="primary">Reset filter</w-button
+      variant="primary">Reset</w-button
     >
   </div>
-
   <div class="grid my-24 gap-24 grid-cols-1 md:grid-cols-2">
-    <!-- First column with Semantic tokens -->
-    <div>
-      <h2 class="text-m">Semantic tokens</h2>
-
-      <!-- Display a loading message if filteredTokens is empty -->
-      {#if filteredTokens.length === 0}
-        <p>No match</p>
-      {:else}
-        <!-- Iterate through filteredTokens and display each one -->
-        {#each filteredTokens as token}
-          <div
-            on:click={() => tokenClicked(token)}
-            class="tokenitem flex items-center my-8 border s-border-default rounded-8"
-          >
-            <div
-              class="colordot w-16 h-32 mr-8"
-              style="background-color: {token.value};"
-            />
-            {token.name}
-          </div>
-        {/each}
-      {/if}
-    </div>
-    <!-- Second column with Primitive colours -->
+    <!-- Column with Primitive colours -->
     <div>
       <h2 class="text-m">Colour</h2>
 
@@ -240,16 +242,51 @@
         <p>No match</p>
       {:else}
         <!-- Iterate through filteredColors and display each one -->
-        {#each filteredColors as color}
+        {#each filteredColors as color (color.name)}
           <div
             on:click={() => colorClicked(color)}
             class="tokenitem flex items-center my-8 border s-border-default rounded-8"
+            transition:slide={{
+              delay: 250,
+              duration: 300,
+              easing: quintOut,
+              axis: "y",
+            }}
           >
             <div
               class="colordot w-16 h-32 mr-8"
               style="background-color: {color.value};"
             />
-            {color.name}
+            <div>{color.name}</div>
+            <div class="grow text-right mx-8">{color.count}</div>
+          </div>
+        {/each}
+      {/if}
+    </div>
+    <!-- Column Semantic tokens -->
+    <div>
+      <h2 class="text-m">Semantic tokens</h2>
+
+      <!-- Display a loading message if filteredTokens is empty -->
+      {#if filteredTokens.length === 0}
+        <p>No match</p>
+      {:else}
+        <!-- Iterate through filteredTokens and display each one -->
+        {#each filteredTokens as token (token.name)}
+          <div
+            class="flex items-center my-8"
+            transition:slide={{
+              delay: 250,
+              duration: 300,
+              easing: quintOut,
+              axis: "y",
+            }}
+          >
+            <div
+              class="colordot w-16 h-16 rounded-8 border mr-8"
+              style="background-color: {token.value};"
+            />
+            {token.name}
           </div>
         {/each}
       {/if}
