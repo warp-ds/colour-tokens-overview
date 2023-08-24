@@ -118,12 +118,13 @@
             ];
           } else {
             // Handle nested shades if necessary
-            for (let variant in colorObj[key][shade]) {
+            // Only store the value associated with the '_' key
+            if (colorObj[key][shade]["_"]) {
               allColors = [
                 ...allColors,
                 {
-                  name: cleanColorName(`${key}-${shade}-${variant}`),
-                  value: colorObj[key][shade][variant],
+                  name: cleanColorName(`${key}-${shade}`),
+                  value: colorObj[key][shade]["_"],
                   count: 0, // default value
                 },
               ];
@@ -136,8 +137,6 @@
     allColors.forEach((color) => {
       color.count = countTokensForColor(color.name);
     });
-
-    console.log("allColors", allColors);
   }
 
   // When data is loaded, flatten and put into arrays
@@ -148,13 +147,8 @@
     filteredTokens = allTokens;
     filteredColors = allColors;
 
-    // log
-    // console.log("allTokens:");
-    // console.log(allTokens);
-    console.log("allColors:");
-    console.log(allColors);
-    // console.log("tokenColorMapping:");
-    // console.log(tokenColorMapping);
+    console.log("tokens:", tokens);
+    console.log("colors:", colors);
   }
 
   // Count how many semantic tokens refer to a given colour
@@ -198,9 +192,6 @@
   function tokenClicked(token) {
     selectedColorOrToken = token;
 
-    console.log("selected token:", token);
-    console.log(token);
-
     // Get the color associated with this token
     const associatedColorName = tokenColorMapping[token.name];
     filteredColors = allColors.filter((color) => {
@@ -222,7 +213,9 @@
 <main>
   <h1 class="my-8 text-l">Colour Tokens in WARP</h1>
   <p>
-    Click a colour to see which semantic tokens use that colour. The number next to the colour indicates how many semantic tokens refer to that colour. Currently this site only includes the FINN light theme.
+    Click a colour to see which semantic tokens use that colour. The number next
+    to the colour indicates how many semantic tokens refer to that colour.
+    Currently this site only includes the FINN light theme.
   </p>
 
   <div style="height: 60px;" class="my-16">
@@ -244,7 +237,16 @@
         <!-- Iterate through filteredColors and display each one -->
         {#each filteredColors as color (color.name)}
           <div
+            role="button"
+            tabindex="0"
+            aria-label={`Select color ${color.name}`}
             on:click={() => colorClicked(color)}
+            on:keydown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault(); // Prevents the default action (scrolling when space is pressed)
+                colorClicked(color);
+              }
+            }}
             class="tokenitem flex items-center my-8 border s-border-default rounded-8"
             transition:slide={{
               delay: 250,
