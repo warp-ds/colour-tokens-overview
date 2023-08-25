@@ -61,7 +61,9 @@
   function flattenTokens(prefix, tokenObj) {
     for (let key in tokenObj) {
       if (typeof tokenObj[key] === "string") {
-        let fullTokenName = prefix ? `s-color-${prefix}-${key}` : key;
+        let fullTokenName = prefix
+          ? `s-${prefix.replace("background", "bg")}-${key}`
+          : `s-${key}`;
 
         // Remove trailing "-_"
         if (fullTokenName.endsWith("-_")) {
@@ -211,11 +213,20 @@
 </script>
 
 <main>
-  <h1 class="my-8 text-l">Colour Tokens in WARP</h1>
+  <h1 class="my-32 text-l">Colours in WARP</h1>
   <p>
-    Click a colour to see which semantic tokens use that colour. The number next
-    to the colour indicates how many semantic tokens refer to that colour.
-    Currently this site only includes the FINN light theme.
+    Click a colour to see which semantic classes refer to that colour. The
+    number next to the colour indicates how many semantic classes refer to that
+    colour. Currently this site only includes the FINN light theme.
+  </p>
+  <p>
+    Classes should only be used intentionally. For example, a "-hover" class
+    should only be used for hover states. If you can't find a relevant class,
+    ask your designer if the colour should be changed, or reach out to the Warp
+    team on Slack:
+    <a href="https://sch-chat.slack.com/archives/C04P0GYTHPV"
+      >#nmp-warp-design-system</a
+    >.
   </p>
 
   <div style="height: 60px;" class="my-16">
@@ -267,7 +278,7 @@
     </div>
     <!-- Column Semantic tokens -->
     <div>
-      <h2 class="text-m">Semantic tokens</h2>
+      <h2 class="text-m">Semantic classes</h2>
 
       <!-- Display a loading message if filteredTokens is empty -->
       {#if filteredTokens.length === 0}
@@ -306,7 +317,7 @@
   main {
     padding: 16px;
     margin: auto;
-    max-width: 1400px;
+    max-width: 700px;
     height: 100%;
     display: flex;
     flex-direction: column;

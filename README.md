@@ -1,8 +1,8 @@
 # Colour tokens overview
 
-Web site that shows an overview of colour tokens in Warp, and the mapping between colours and semantic tokens. 
+Web site that shows an overview of colours and colour classes in Warp, and the mapping between these. 
 
-Currently only contains colours for the FINN Light theme. The colours are loaded from YAML files during runtime in order to always be updated.
+Currently the site only contains colours for the FINN Light theme. The colours are loaded from YAML files during runtime in order to always be updated.
 
 The project was created by a designers, so don't expect the code to be perfect. 
 
@@ -29,4 +29,4 @@ Set up with Vite and Svelte
 This will load the yaml files during runtime.
 `npm install js-yaml`
 
-
+The project is built to the dist folder, put in the gh-pages branch, and published to Github pages.
