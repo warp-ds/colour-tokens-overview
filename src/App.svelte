@@ -13,14 +13,14 @@
   onMount(async () => {
     // Fetch and parse the colors YAML
     const colorsResponse = await fetch(
-      "https://raw.githubusercontent.com/warp-ds/css/alpha/tokens/finn.no/colors.yml"
+      "https://raw.githubusercontent.com/warp-ds/css/next/tokens/finn.no/colors.yml"
     );
     const colorsYaml = await colorsResponse.text();
     colors = jsyaml.load(colorsYaml);
 
     // Fetch and parse the tokens YAML
     const tokensResponse = await fetch(
-      "https://raw.githubusercontent.com/warp-ds/css/alpha/tokens/finn.no/semantic.yml"
+      "https://raw.githubusercontent.com/warp-ds/css/next/tokens/finn.no/semantic.yml"
     );
     const tokensYaml = await tokensResponse.text();
     tokens = jsyaml.load(tokensYaml);
