@@ -1,6 +1,7 @@
 <script>
   import "@warp-ds/elements";
   import { onMount } from "svelte";
+  import jsyaml from "js-yaml";
 
   // Declare reactive variables to hold the parsed data
   let colors = null;

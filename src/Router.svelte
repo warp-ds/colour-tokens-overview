@@ -3,62 +3,52 @@
   import { Router, Route, Link, navigate } from "svelte-routing";
   import Colours from "./pages/Colours.svelte";
   import Contrast from "./pages/Contrast.svelte";
-  import { onMount } from "svelte";
+  import { onMount, onDestroy } from "svelte";
   import { writable } from "svelte/store";
 
-  // store currently active tab
-  const activeRoute = writable("");
+  // Use has
+  let currentHash = window.location.hash.slice(1); // Remove the '#' at the start
 
-  // Redirect to colours
-  onMount(() => {
-    if (window.location.pathname === "/colour-tokens-overview/") {
-      navigate("/colour-tokens-overview/colours.html");
+  // Update currentHash when hash changes
+  function hashChangeHandler() {
+    currentHash = window.location.hash.slice(1);
+    if (currentHash === "/colour-tokens-overview/") {
+      window.location.hash = "/colour-tokens-overview/colours.html";
     }
+  }
+
+  //  Attach the event listener
+  onMount(() => {
+    window.addEventListener("hashchange", hashChangeHandler, false);
+    if (window.location.hash === "") {
+      window.location.hash = "#/colour-tokens-overview/colours.html";
+    }
+  });
+
+  // Clean up the event listener
+  onDestroy(() => {
+    window.removeEventListener("hashchange", hashChangeHandler, false);
   });
 </script>
 
 <!-- Nav bar -->
 <Router>
   <nav class="p-8 s-bg-subtle">
-    <span
-      class={$activeRoute === "/colour-tokens-overview/colours" ? "active" : ""}
-    >
-      <Link
+    <a
       class="p-8 hover:s-bg-hover active:s-bg-selected"
-        to="/colour-tokens-overview/colours.html">Colours in WARP</Link
-      >
-    </span>
-    <span
-      class={$activeRoute === "/colour-tokens-overview/contrast"
-        ? "active"
-        : ""}
-    >
-      <Link
-        class="p-8 hover:s-bg-hover active:s-bg-selected"
-        to="/colour-tokens-overview/contrast.html">Contrast</Link
-      >
-    </span>
+      href="#/colour-tokens-overview/colours.html">Colours in WARP</a>
+    <a
+      class="p-8 hover:s-bg-hover active:s-bg-selected"
+      href="#/colour-tokens-overview/contrast.html">Contrast</a>
   </nav>
-
-  <!-- Set activeRoute -->
-
-  <Route path="/colour-tokens-overview/colours.html">
-    <svelte:component this={Colours} />
-    {#if $activeRoute !== "/colour-tokens-overview/colours.html"}
-      {($activeRoute = "/colour-tokens-overview/colours.html")}
-    {/if}
-  </Route>
-
-  <Route path="/colour-tokens-overview/contrast.html">
-    <svelte:component this={Contrast} />
-    {#if $activeRoute !== "/colour-tokens-overview/contrast.html"}
-      {($activeRoute = "/colour-tokens-overview/contrast.html")}
+  <Route path={currentHash}>
+    {#if currentHash === "/colour-tokens-overview/colours.html"}
+      <Colours />
+    {:else if currentHash === "/colour-tokens-overview/contrast.html"}
+      <Contrast />
     {/if}
   </Route>
 </Router>
 
 <style>
-  span.active {
-    background-color: var(--w-s-color-background-selected);
-  }
 </style>

@@ -231,7 +231,15 @@
 
   <div style="height: 60px;" class="my-16">
     <w-button
+      role="button"
+      tabindex="0"
       on:click={() => resetFilter()}
+      on:keydown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault(); // Prevents the default action (scrolling when space is pressed)
+          resetFilter();
+        }
+      }}
       class={selectedColorOrToken ? "" : "hidden"}
       variant="primary">Reset</w-button
     >
