@@ -27,7 +27,7 @@
   });
 </script>
 
-<nav class="p-8">
+<nav class="p-16">
   <a
     class="p-8 rounded-4"
     class:selected_page={currentRoute === '/colour-tokens-overview/colours.html'}
