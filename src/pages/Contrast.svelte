@@ -1,43 +1,116 @@
 <script>
   import "@warp-ds/elements";
-  import { onMount } from "svelte";
-  import jsyaml from "js-yaml";
+  import { get } from "svelte/store";
+  import { checkColors } from "../lib/color-checker.js";
 
-  // Declare reactive variables to hold the parsed data
-  let colors = null;
-  let tokens = null;
+  // Get data from dataStore
+  import {
+    dataFetched,
+    dataProcessed,
+    fetchTokens,
+    allTokens,
+    allColors,
+    tokenColorMapping,
+  } from "../lib/dataStore.js";
 
-  // Read the data from YAML files online
-  onMount(async () => {
-    // Fetch and parse the colors YAML
-    const colorsResponse = await fetch(
-      "https://raw.githubusercontent.com/warp-ds/css/next/tokens/finn.no/colors.yml"
-    );
-    const colorsYaml = await colorsResponse.text();
-    colors = jsyaml.load(colorsYaml);
+  let filteredTokens = [];
+  let filteredColors = [];
+  let backgroundTokens = [];
+  let foregroundTokens = [];
 
-    // Fetch and parse the tokens YAML
-    const tokensResponse = await fetch(
-      "https://raw.githubusercontent.com/warp-ds/css/next/tokens/finn.no/semantic.yml"
-    );
-    const tokensYaml = await tokensResponse.text();
-    tokens = jsyaml.load(tokensYaml);
+  // let foreground = "#FF5733"; // example color
+  // let background = "#1D1B1B"; // example color
 
-    // console.log(colors);
-    // console.log(tokens);
-  });
+  // If data hasn't been processed, make sure it is fetched and processed
+  $: if (!get(dataProcessed)) {
+    // console.log("data not processed yet");
 
+    // if data hasn't been fetched, fetch it
+    if (!get(dataFetched)) {
+      // console.log("data not fetched. Fetching data");
+      fetchTokens();
+    } else {
+      console.log("waiting for data to be processed. This is an issue");
+    }
 
+    // When data is processed, run this
+  } else {
+    // console.log("setting filtered data");
+    console.log("allTokens", $allTokens);
 
+    filteredTokens = $allTokens;
+    filteredColors = $allColors;
+
+    // Keep only the regular background colours
+    backgroundTokens = $allTokens.filter((token) => {
+      const name = token.name;
+      return (
+        name.includes("background") &&
+        !name.endsWith("-hover") &&
+        !name.endsWith("-active") &&
+        !name.endsWith("-selected") &&
+        !name.endsWith("-selected-hover")
+      );
+    });
+
+    // Keep only the regular foreground colours
+    foregroundTokens = $allTokens.filter((token) => {
+      const name = token.name;
+      return name.includes("text");
+    });
+
+    // console.log("dataFetched. filteredTokens and filteredColors:");
+    // console.log(filteredTokens, filteredColors);
+
+    // colorResults = checkColors(foreground, background).contrast;
+    // console.log("color contrast:");
+    // console.log(colorResults);
+  }
 </script>
 
 <main>
   <h1 class="my-32 text-l">Contrast between text and background</h1>
   <p>
-    This is primarily a tool for the Warp team to check the contrast between the various text colours and background colours. 
+    This is primarily a tool for the Warp team to check the contrast between the
+    various text colours and background colours.
   </p>
 
-  
+  {#if backgroundTokens.length === 0}
+    <p>No background colours loaded</p>
+  {:else}
+    {#each backgroundTokens as background (background.name)}
+      <h2 class="my-32 text-m">{background.name}</h2>
+      <p>{background.value}</p>
+
+      <div>
+        <!-- Table for foreground colours -->
+        {#if foregroundTokens.length === 0}
+          <p>No foreground colours loaded</p>
+        {:else}
+          <table class="table-auto border-spacing-16">
+            <thead>
+              <tr class="text-left">
+                <th>Name</th>
+                <th>Value</th>
+                <th>Contrast</th>
+              </tr>
+            </thead>
+
+            <!-- Iterate through colours and display each one -->
+            <tbody>
+              {#each foregroundTokens as token (token.name)}
+                <tr>
+                  <td>{token.name}</td>
+                  <td>{token.value}</td>
+                  <td>{checkColors(token.value, "#ffffff").contrast}</td>
+                </tr>
+              {/each}
+            </tbody>
+          </table>
+        {/if}
+      </div>
+    {/each}
+  {/if}
 </main>
 
 <style>

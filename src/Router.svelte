@@ -11,7 +11,7 @@
   // When user navigates to a different hash route
   function updateRoute() {
     const hash =
-      window.location.hash.slice(1) || "/colour-tokens-overview/colours.html";
+      window.location.hash.slice(1) || "/colours.html";
     currentRoute = hash;
   }
 
@@ -30,21 +30,21 @@
 <nav class="p-16">
   <a
     class="p-8 rounded-4"
-    class:selected_page={currentRoute === '/colour-tokens-overview/colours.html'}
-    href="#/colour-tokens-overview/colours.html">Colours in WARP</a
+    class:selected_page={currentRoute === '/colours.html'}
+    href="#/colours.html">Colours in WARP</a
   >
   <a
   class="p-8 rounded-4"
-    class:selected_page={currentRoute === '/colour-tokens-overview/contrast.html'}
-    href="#/colour-tokens-overview/contrast.html">Contrast</a
+    class:selected_page={currentRoute === '/contrast.html'}
+    href="#/contrast.html">Contrast</a
   >
 
 </nav>
 
 
-{#if currentRoute === "/colour-tokens-overview/colours.html"}
+{#if currentRoute === "/colours.html"}
   <Colours />
-{:else if currentRoute === "/colour-tokens-overview/contrast.html"}
+{:else if currentRoute === "/contrast.html"}
   <Contrast />
 {:else}
   <NotFound />
