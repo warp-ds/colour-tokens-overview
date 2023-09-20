@@ -72,14 +72,17 @@
   <h1 class="my-32 text-l">Contrast between text and background</h1>
   <p>
     This is primarily a tool for the Warp team to check the contrast between the
-    various text colours and background colours. Currently only for FINN colours.
+    various text colours and background colours. Currently only for FINN
+    colours.
+
+    The colour contrast for small and normal text must be minimun <strong>4.5 : 1</strong>. 
   </p>
 
   {#if backgroundTokens.length === 0}
     <p>No background colours loaded</p>
   {:else}
     {#each backgroundTokens as background (background.name)}
-      <h2 class="mt-32 text-ml">{background.name}</h2>
+      <h2 class="mt-56 text-ml">{background.name}</h2>
 
       <div class="flex">
         <div
@@ -95,15 +98,16 @@
         {:else}
           <!-- Table for foreground colours -->
           <table
-            class="mt-32 border-spacing-16"
+            class="mt-24 mb-56 border-spacing-x-24"
             style="border-collapse: separate;"
           >
             <thead>
               <tr class="text-left">
                 <th>Text colour name</th>
                 <th>Colour</th>
-                <th>Normal text</th>
+                <th>Example</th>
                 <th>Contrast</th>
+                <th>Usage</th>
               </tr>
             </thead>
 
@@ -130,17 +134,32 @@
                       <p>{token.colorName}</p>
                     </div>
                   </td>
-                  <!-- Normal text -->
+                  <!-- Example -->
                   <td>
                     <div
-                      class="mt-2 colorsquare border rounded-4 flex justify-center items-center h-24"
+                      class="mt-2 px-8 colorsquare border rounded-4 flex justify-center items-center h-24"
                       style="background-color: {background.value};"
                     >
                       <p class="mb-0" style="color: {token.value};">ABC abc</p>
                     </div>
                   </td>
                   <!-- Contrast -->
-                  <td>{checkColors(token.value, background.value).contrast}</td>
+                  <td class="text-right">
+                      {checkColors(token.value, background.value).contrast} : 1
+                  </td>
+                  <!-- Usage -->
+                  <td>
+                      <!-- Evaluation OK or not -->
+                      {#if parseFloat(checkColors(token.value, background.value).contrast) > 4.5}
+                        <div class="px-8 s-bg-positive s-text-inverted rounded-4 flex justify-center items-center h-24" >
+                          <p class="mt-8">OK</p>
+                        </div>
+                      {:else}
+                        <div class="px-8 s-bg-negative s-text-inverted rounded-4 flex justify-center items-center h-24">
+                          <p class="mt-8">Not OK</p>
+                        </div>
+                      {/if}
+                  </td>
                 </tr>
               {/each}
             </tbody>
@@ -169,5 +188,13 @@
 
   .colorsquare {
     border-color: var(--w-s-color-border-default);
+  }
+
+  table {
+    margin-left: -24px; /* Adjust to match your border-spacing value */
+  }
+
+  td:first-child {
+    padding-left: 0;
   }
 </style>
