@@ -101,10 +101,14 @@ function flattenTokens(prefix, tokenObj) {
 
       const hexColor = getColorForToken(tokenObj[key]);
 
+      // Define the color name
+      const colorName = tokenObj[key];
+
       // Avoid duplicates and avoid pushing null values
       if (!resultTokens.some(token => token.name === fullTokenName) && hexColor !== null) {
         resultTokens.push({
           name: fullTokenName,
+          colorName: colorName,
           value: hexColor
         });
       }
@@ -120,10 +124,14 @@ function flattenTokens(prefix, tokenObj) {
       if (tokenObj[key].hasOwnProperty('_')) {
         const hexColor = getColorForToken(tokenObj[key]['_']);
 
+        // Define the color name here.
+        const colorName = tokenObj[key]['_'];
+
         // Avoid duplicates and avoid pushing null values
         if (!resultTokens.some(token => token.name === nextPrefix) && hexColor !== null) {
           resultTokens.push({
             name: nextPrefix,
+            colorName: colorName,
             value: hexColor
           });
         }

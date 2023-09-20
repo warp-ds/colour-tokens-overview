@@ -79,20 +79,22 @@
     <p>No background colours loaded</p>
   {:else}
     {#each backgroundTokens as background (background.name)}
-      <h2 class="my-32 text-m">{background.name}</h2>
-      <p>{background.value}</p>
+      <h2 class="mt-32 text-ml">{background.name}</h2>
+      <p>Colour: {background.value}</p>
+      <p style="color: {background.value};">ABC abc</p>
 
       <div>
         <!-- Table for foreground colours -->
         {#if foregroundTokens.length === 0}
           <p>No foreground colours loaded</p>
         {:else}
-          <table class="table-auto border-spacing-16">
+          <table class="mt-32 border-spacing-4 border-collapse ">
             <thead>
               <tr class="text-left">
-                <th>Name</th>
-                <th>Value</th>
+                <th>Text colour name</th>
+                <th>Colour</th>
                 <th>Contrast</th>
+                <th>Normal text</th>
               </tr>
             </thead>
 
@@ -101,8 +103,14 @@
               {#each foregroundTokens as token (token.name)}
                 <tr>
                   <td>{token.name}</td>
-                  <td>{token.value}</td>
+                  <td>{token.colorName}</td>
                   <td>{checkColors(token.value, "#ffffff").contrast}</td>
+                  <td>
+                    <div style="background-color: {background.value};">
+                      <p style="color: {token.value};">ABC abc</p>
+
+                    </div>
+                  </td>
                 </tr>
               {/each}
             </tbody>
