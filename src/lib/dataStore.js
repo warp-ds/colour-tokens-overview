@@ -60,7 +60,14 @@ function getColorForToken(token) {
     const colorName = parts[0];
     const shade = parts[1];
     if (colors[colorName] && colors[colorName][shade]) {
-      return colors[colorName][shade];
+      // Check if the color shade is a string (hex color)
+      if (typeof colors[colorName][shade] === "string") {
+        return colors[colorName][shade];
+      }
+      // If it's an object, return the default "_" value
+      else if (colors[colorName][shade]["_"]) {
+        return colors[colorName][shade]["_"];
+      }
     }
   } else if (parts.length === 3) {
     const colorName = parts[0];

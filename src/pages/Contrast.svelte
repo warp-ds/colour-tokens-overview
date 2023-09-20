@@ -72,7 +72,7 @@
   <h1 class="my-32 text-l">Contrast between text and background</h1>
   <p>
     This is primarily a tool for the Warp team to check the contrast between the
-    various text colours and background colours.
+    various text colours and background colours. Currently only for FINN colours.
   </p>
 
   {#if backgroundTokens.length === 0}
@@ -80,21 +80,30 @@
   {:else}
     {#each backgroundTokens as background (background.name)}
       <h2 class="mt-32 text-ml">{background.name}</h2>
-      <p>Colour: {background.value}</p>
-      <p style="color: {background.value};">ABC abc</p>
+
+      <div class="flex">
+        <div
+          class="colorsquare w-24 h-24 rounded-4 border mr-8"
+          style="background-color: {background.value};"
+        />
+        <p>{background.colorName}, {background.value}</p>
+      </div>
 
       <div>
-        <!-- Table for foreground colours -->
         {#if foregroundTokens.length === 0}
           <p>No foreground colours loaded</p>
         {:else}
-          <table class="mt-32 border-spacing-4 border-collapse ">
+          <!-- Table for foreground colours -->
+          <table
+            class="mt-32 border-spacing-16"
+            style="border-collapse: separate;"
+          >
             <thead>
               <tr class="text-left">
                 <th>Text colour name</th>
                 <th>Colour</th>
-                <th>Contrast</th>
                 <th>Normal text</th>
+                <th>Contrast</th>
               </tr>
             </thead>
 
@@ -102,15 +111,36 @@
             <tbody>
               {#each foregroundTokens as token (token.name)}
                 <tr>
+                  <!-- Name -->
                   <td>{token.name}</td>
-                  <td>{token.colorName}</td>
-                  <td>{checkColors(token.value, "#ffffff").contrast}</td>
-                  <td>
-                    <div style="background-color: {background.value};">
-                      <p style="color: {token.value};">ABC abc</p>
+                  <!-- Colour -->
 
+                  <td>
+                    <div class="flex mt-8">
+                      <div
+                        class="colorsquare w-24 h-24 rounded-4 border mr-8 flex justify-center items-center"
+                        style="background-color: {background.value};"
+                      >
+                        <div
+                          class="w-16 h-16 rounded-2"
+                          style="background-color: {token.value};"
+                        />
+                      </div>
+
+                      <p>{token.colorName}</p>
                     </div>
                   </td>
+                  <!-- Normal text -->
+                  <td>
+                    <div
+                      class="mt-2 colorsquare border rounded-4 flex justify-center items-center h-24"
+                      style="background-color: {background.value};"
+                    >
+                      <p class="mb-0" style="color: {token.value};">ABC abc</p>
+                    </div>
+                  </td>
+                  <!-- Contrast -->
+                  <td>{checkColors(token.value, background.value).contrast}</td>
                 </tr>
               {/each}
             </tbody>
@@ -135,5 +165,9 @@
     height: 100%;
     display: flex;
     flex-direction: column;
+  }
+
+  .colorsquare {
+    border-color: var(--w-s-color-border-default);
   }
 </style>

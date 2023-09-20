@@ -68,7 +68,7 @@
 
     // Get the color associated with this token
     const associatedColorName = $tokenColorMapping[token.name];
-    filteredColors = allColors.filter((color) => {
+    filteredColors = $allColors.filter((color) => {
       return color.name === associatedColorName;
     });
 
