@@ -164,13 +164,13 @@
                     {#if parseFloat(checkColors(token.value, background.value).contrast) > 4.5}
                       <img
                         class="h-24 mt-10"
-                        src="/colour-tokens-overview/src/assets/green_check.svg"
+                        src="/colour-tokens-overview/green_check.svg"
                         alt="Green check"
                       />
                     {:else}
                       <img
                         class="h-24 mt-10"
-                        src="/colour-tokens-overview/src/assets/red_cross.svg"
+                        src="/colour-tokens-overview/red_cross.svg"
                         alt="Red cross"
                       />
                     {/if}
