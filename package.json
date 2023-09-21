@@ -18,10 +18,11 @@
     "vite": "^4.4.5"
   },
   "dependencies": {
-    "@warp-ds/component-classes": "^1.0.0-alpha.116",
-    "@warp-ds/elements": "^1.0.0-alpha.27",
-    "@warp-ds/uno": "^1.0.0-alpha.49",
+    "@warp-ds/css": "^1.1.0",
+    "@warp-ds/elements": "^1.0.0",
+    "@warp-ds/uno": "^1.1.0",
     "js-yaml": "^4.1.0",
-    "unocss": "^0.53.1"
+    "svelte-routing": "^2.1.0",
+    "unocss": "^0.56.0"
   }
 }
