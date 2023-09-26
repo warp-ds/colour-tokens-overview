@@ -1,7 +1,25 @@
 <script>
+  // @ts-nocheck
+
   import "@warp-ds/elements";
+  // import { APCAcontrast, APCAcontrastFromHex } from 'apca-w3/src/apca-w3.js';
+  import {
+    APCAcontrast,
+    reverseAPCA,
+    sRGBtoY,
+    displayP3toY,
+    adobeRGBtoY,
+    alphaBlend,
+    calcAPCA,
+    fontLookupAPCA,
+  } from "apca-w3";
+  import { colorParsley, colorToHex, colorToRGB } from "colorparsley";
+
   import { get } from "svelte/store";
   import { checkColors } from "../lib/color-checker.js";
+
+  // let contrastLc = APCAcontrast( sRGBtoY( colorParsley('#000000') ), sRGBtoY( colorParsley('#e6e0dd') ) );
+  // console.log("constrast LC",   Math.round(contrastLc*10)/10);
 
   // Get data from dataStore
   import {
@@ -17,6 +35,8 @@
   let filteredColors = [];
   let backgroundTokens = [];
   let foregroundTokens = [];
+
+  let hideBadContrastColours = true;
 
   // let foreground = "#FF5733"; // example color
   // let background = "#1D1B1B"; // example color
@@ -36,7 +56,7 @@
     // When data is processed, run this
   } else {
     // console.log("setting filtered data");
-    console.log("allTokens", $allTokens);
+    // console.log("allTokens", $allTokens);
 
     filteredTokens = $allTokens;
     filteredColors = $allColors;
@@ -77,32 +97,49 @@
       >4.5 : 1</strong
     >.
   </p>
+  <p>
+    <a href="https://www.myndex.com/APCA/">APCA contrast</a> (WCAG 3.0) takes font size and weight into consideration. For example, APCA L<sup>c</sup> contrast for normal,
+    non-bold text:
+  </p>
+  <ul>
+    <li>L<sup>c</sup> 100: 15px or larger</li>
+    <li>L<sup>c</sup> 90: 16px or larger</li>
+    <li>L<sup>c</sup> 75: 18px or larger</li>
+    <li>L<sup>c</sup> 60: 24px or larger</li>
+    <li>L<sup>c</sup> 45: 42px or larger</li>
+  </ul>
 
-  <!-- Checkbox 
   <div class="mt-32">
     <input
-    type="checkbox"
-    id="accessibilityOnly"
-    name="accessibilityOnly"
-    value="checkedValue"
-  />
-  <label for="accessibilityOnly">Only accessible colour combinations</label>
-
+      type="checkbox"
+      id="accessibilityOnly"
+      name="accessibilityOnly"
+      bind:checked={hideBadContrastColours}
+    />
+    <label for="accessibilityOnly"
+      >Show accessible colour combinations only</label
+    >
   </div>
-  -->
-  
+
   {#if backgroundTokens.length === 0}
     <p>No background colours loaded</p>
   {:else}
     {#each backgroundTokens as background (background.name)}
+      <!-- Name of background colour -->
       <h2 class="mt-56 text-ml">{background.name}</h2>
+
+      <!-- Circle with colour -->
+      <!-- Add border if white background -->
 
       <div class="flex mt-8">
         <div
-          class="colorsquare w-24 h-24 rounded-4 mr-8"
+          class="w-24 h-24 rounded-4 mr-8 {background.value === '#ffffff'
+            ? 'colorsquare border'
+            : ''}"
           style="background-color: {background.value};"
         />
-        <p> {background.colorName}</p>
+        <!-- Colour name for this paleettet -->
+        <p>{background.colorName}</p>
       </div>
 
       <div>
@@ -122,60 +159,90 @@
                 <th>Example</th>
                 <th>Contrast</th>
                 <th>Accessible</th>
+                <th>APCA</th>
               </tr>
             </thead>
 
             <!-- Iterate through colours and display each one -->
             <tbody>
               {#each foregroundTokens as token (token.name)}
-                <tr>
-                  <!-- Name -->
-                  <td>
-                    <p class="mt-6">{token.name}</p>
-                  </td>
-                  <!-- Colour -->
-                  <td>
-                    <div class="flex items-center">
+                <!-- If filter, only show good contrast numbers -->
+                {#if !hideBadContrastColours || (hideBadContrastColours && parseFloat(checkColors(token.value, background.value).contrast) > 4.5)}
+                  <tr>
+                    <!-- Name -->
+                    <td style="width: 215px;">
+                      <p class="mt-6">{token.name}</p>
+                    </td>
+                    <!-- Colour -->
+                    <td style="width: 180px;">
+                      <div class="flex items-center">
+                        <div
+                          class="w-24 h-24 mr-8 rounded-2 {token.value ===
+                          '#ffffff'
+                            ? 'colorsquare border'
+                            : ''}"
+                          style="background-color: {token.value};"
+                        />
+                        <p class="mt-6">{token.colorName}</p>
+                      </div>
+                    </td>
+                    <!-- Example -->
+                    <td>
                       <div
-                        class="w-24 h-24 mr-8 rounded-2"
-                        style="background-color: {token.value};"
-                      />
-                      <p class="mt-6">{token.colorName}</p>
-                    </div>
-                  </td>
-                  <!-- Example -->
-                  <td>
-                    <div
-                      class="h-48 w-128 colorsquare rounded-4 flex justify-center items-center"
-                      style="background-color: {background.value};"
-                    >
-                      <p class="mb-2" style="color: {token.value};">ABC abc</p>
-                    </div>
-                  </td>
-                  <!-- Contrast -->
-                  <td class="text-left">
-                    <p class="mt-6">
-                      {checkColors(token.value, background.value).contrast} : 1
-                    </p>
-                  </td>
-                  <!-- Accessible -->
-                  <td class="flex justify-center items-center">
-                    <!-- Evaluation OK or not -->
-                    {#if parseFloat(checkColors(token.value, background.value).contrast) > 4.5}
-                      <img
-                        class="h-24 mt-10"
-                        src="/colour-tokens-overview/green_check.svg"
-                        alt="Green check"
-                      />
-                    {:else}
-                      <img
-                        class="h-24 mt-10"
-                        src="/colour-tokens-overview/red_cross.svg"
-                        alt="Red cross"
-                      />
-                    {/if}
-                  </td>
-                </tr>
+                        class="h-48 w-128 rounded-4 flex justify-center items-center {background.value ===
+                        '#ffffff'
+                          ? 'colorsquare border'
+                          : ''}"
+                        style="background-color: {background.value};"
+                      >
+                        <p class="mb-2" style="color: {token.value};">
+                          ABC abc
+                        </p>
+                      </div>
+                    </td>
+                    <!-- Contrast -->
+                    <td class="text-left">
+                      <p class="mt-6">
+                        {checkColors(token.value, background.value).contrast} : 1
+                      </p>
+                    </td>
+                    <!-- Accessible -->
+                    <td class="flex justify-center items-center">
+                      <!-- Evaluation OK or not -->
+                      {#if parseFloat(checkColors(token.value, background.value).contrast) > 4.5}
+                        <img
+                          class="h-24 mt-10"
+                          src="/colour-tokens-overview/green_check.svg"
+                          alt="Green check"
+                        />
+                      {:else}
+                        <img
+                          class="h-24 mt-10"
+                          src="/colour-tokens-overview/red_cross.svg"
+                          alt="Red cross"
+                        />
+                      {/if}
+                    </td>
+                    <!-- ACPA -->
+                    <td class="text-right">
+                      <p class="mt-6">
+                        {(() => {
+                          const colorForeground = sRGBtoY(
+                            colorParsley(token.value)
+                          );
+                          const colorBackground = sRGBtoY(
+                            colorParsley(background.value)
+                          );
+                          const contrastValue = APCAcontrast(
+                            colorForeground,
+                            colorBackground
+                          );
+                          return Math.abs(Math.round(contrastValue ) );
+                        })()}
+                      </p>
+                    </td>
+                  </tr>
+                {/if}
               {/each}
             </tbody>
           </table>
@@ -203,6 +270,11 @@
 
   .colorsquare {
     border-color: var(--w-s-color-border-default);
+  }
+
+  ul {
+    list-style-type: disc; /* disc is the default bullet point style */
+    padding-left: 32px;
   }
 
   table {
@@ -245,7 +317,7 @@
   }
 
   input[type="checkbox"],
-label {
+  label {
     vertical-align: middle;
-}
+  }
 </style>

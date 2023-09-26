@@ -247,8 +247,8 @@ function processColorsAndTokens() {
   // Update Svelte store for colors
   allColors.set(colorsList);
 
-  console.log("tokensList", tokensList);
-  console.log("colorsList", colorsList);
+  // console.log("tokensList", tokensList);
+  // console.log("colorsList", colorsList);
 
   // console.log("tokenColorMap", tokenColorMap);
   // console.log("tokenColorMapping", tokenColorMapping);

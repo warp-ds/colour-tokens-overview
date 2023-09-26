@@ -9,6 +9,8 @@ The project was created by a designers, so don't expect the code to be perfect.
 ## Live web page
 https://warp-ds.github.io/colour-tokens-overview/
 
+The project is built to the `/dist` folder, put in the `gh-pages` branch, which is published to Github pages. 
+This happens automatically through Github Actions.
 
 ## To run locally
 Install:
@@ -18,15 +20,8 @@ Run dev:
 ´npm run dev`
 
 ## History
-Set up with Vite and Svelte
-
+Set up with Vite and Svelte:
 `npm create vite@latest vite-svelte --template svelte`
 
-**Installed Warp:**
-`npm install unocss @warp-ds/uno@1.0.0-alpha.49 @warp-ds/component-classes@1.0.0-alpha.116`
-
-**Installed js-yaml**
-This will load the yaml files during runtime.
-`npm install js-yaml`
-
-The project is built to the dist folder, put in the gh-pages branch, and published to Github pages.
+And Warp:
+`npm install unocss @warp-ds/uno @warp-ds/css`

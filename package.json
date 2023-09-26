@@ -21,6 +21,7 @@
     "@warp-ds/css": "^1.1.0",
     "@warp-ds/elements": "^1.0.0",
     "@warp-ds/uno": "^1.1.0",
+    "apca-w3": "^0.1.9",
     "js-yaml": "^4.1.0",
     "svelte-routing": "^2.1.0",
     "unocss": "^0.56.0"
