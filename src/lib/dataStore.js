@@ -95,11 +95,19 @@ function flattenTokens(prefix, tokenObj) {
       continue;
     }
 
+    let fullTokenName = prefix
+    ? `${prefix}-${key}`
+    : key;
+
+
+      // Remove "color-" from the token name
+      fullTokenName = fullTokenName.replace("-color-", "-");
+
+
     // if string value
     if (typeof tokenObj[key] === "string") {
-      let fullTokenName = prefix
-        ? `${prefix}-${key}`
-        : key;
+
+
 
       // Remove trailing "-_"
       if (fullTokenName.endsWith("-_")) {
@@ -124,7 +132,8 @@ function flattenTokens(prefix, tokenObj) {
     }
     // If more nested stuff
     else if (typeof tokenObj[key] === "object") {
-      const nextPrefix = prefix ? `${prefix}-${key}` : key;
+      const nextPrefix = fullTokenName; // Use the already cleaned fullTokenName as the next prefix
+            
       const nestedResults = flattenTokens(nextPrefix, tokenObj[key]);
 
       // If the object has a "_" property, use its value for the parent token
