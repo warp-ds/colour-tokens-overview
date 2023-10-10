@@ -86,21 +86,23 @@
 
 <main>
   <h1 class="my-32 text-l">Colours in WARP</h1>
+
+  <w-alert class="my-24" variant="warning" show="">
+    <p class="font-bold">Use colour classes with purpose</p>
+    <p>For example, a "-hover" class should only be used for hover states. If you can't find a relevant class,
+      ask your designer if the colour should be changed, or reach out to the Warp team on Slack:
+      <a href="https://sch-chat.slack.com/archives/C04P0GYTHPV"
+        >#nmp-warp-design-system</a
+      >.</p>
+  </w-alert>
+
   <p>
     Click a colour to see which semantic classes refer to that colour. The
     number next to the colour indicates how many semantic classes refer to that
-    colour. Currently this site only includes the FINN light theme.
-  </p>
-  <p>
-    Classes should only be used intentionally. For example, a "-hover" class
-    should only be used for hover states. If you can't find a relevant class,
-    ask your designer if the colour should be changed, or reach out to the Warp
-    team on Slack:
-    <a href="https://sch-chat.slack.com/archives/C04P0GYTHPV"
-      >#nmp-warp-design-system</a
-    >.
+    colour. Currently this page only includes the FINN light theme.
   </p>
 
+  
   <div style="height: 60px;" class="my-16">
     <w-button
       role="button"
