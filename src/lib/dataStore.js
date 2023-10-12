@@ -100,8 +100,11 @@ function flattenTokens(prefix, tokenObj) {
     : key;
 
 
-      // Remove "color-" from the token name
-      fullTokenName = fullTokenName.replace("-color-", "-");
+    // Remove "color-" from the token name
+    fullTokenName = fullTokenName.replace(/^s-color-/, "s-");
+
+    // Rename "s-background-" to "s-bg-" in the token name
+    fullTokenName = fullTokenName.replace(/^s-background/, "s-bg");
 
 
     // if string value
