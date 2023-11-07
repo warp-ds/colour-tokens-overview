@@ -65,7 +65,7 @@
     backgroundTokens = $allTokens.filter((token) => {
       const name = token.name;
       return (
-        name.includes("background") &&
+        name.includes("bg") &&
         !name.endsWith("-hover") &&
         !name.endsWith("-active") &&
         !name.endsWith("-selected") &&

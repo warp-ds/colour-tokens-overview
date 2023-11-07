@@ -1,7 +1,7 @@
 // NB: since this is not a Svelte file the reactivitiy won't work. Use JavaScript
 
 // src/lib/dataStore.js
-import { writable, get } from 'svelte/store';
+import { writable, get } from "svelte/store";
 import jsyaml from "js-yaml";
 
 // Raw data
@@ -15,7 +15,7 @@ export const tokenColorMapping = writable({});
 
 // Flag to check if data has been fetched
 export const dataFetched = writable(false);
-// export let dataFetched = false;  
+// export let dataFetched = false;
 
 // Flag to check if data has been processed
 export const dataProcessed = writable(false);
@@ -24,7 +24,6 @@ export const dataProcessed = writable(false);
 export async function fetchTokens() {
   // Only run once
   if (!get(dataFetched)) {
-
     // console.log("Running fetchTokens");
 
     // Fetch and parse the colors YAML
@@ -91,14 +90,11 @@ function flattenTokens(prefix, tokenObj) {
 
   for (let key in tokenObj) {
     // Exclude 'token: maps' from the list
-    if (key === 'token' && tokenObj[key] === 'maps') {
+    if (key === "token" && tokenObj[key] === "maps") {
       continue;
     }
 
-    let fullTokenName = prefix
-    ? `${prefix}-${key}`
-    : key;
-
+    let fullTokenName = prefix ? `${prefix}-${key}` : key;
 
     // Remove "color-" from the token name
     fullTokenName = fullTokenName.replace(/^s-color-/, "s-");
@@ -106,12 +102,8 @@ function flattenTokens(prefix, tokenObj) {
     // Rename "s-background-" to "s-bg-" in the token name
     fullTokenName = fullTokenName.replace(/^s-background/, "s-bg");
 
-
     // if string value
     if (typeof tokenObj[key] === "string") {
-
-
-
       // Remove trailing "-_"
       if (fullTokenName.endsWith("-_")) {
         fullTokenName = fullTokenName.substring(0, fullTokenName.length - 2);
@@ -123,11 +115,14 @@ function flattenTokens(prefix, tokenObj) {
       const colorName = tokenObj[key];
 
       // Avoid duplicates and avoid pushing null values
-      if (!resultTokens.some(token => token.name === fullTokenName) && hexColor !== null) {
+      if (
+        !resultTokens.some((token) => token.name === fullTokenName) &&
+        hexColor !== null
+      ) {
         resultTokens.push({
           name: fullTokenName,
           colorName: colorName,
-          value: hexColor
+          value: hexColor,
         });
       }
 
@@ -136,35 +131,41 @@ function flattenTokens(prefix, tokenObj) {
     // If more nested stuff
     else if (typeof tokenObj[key] === "object") {
       const nextPrefix = fullTokenName; // Use the already cleaned fullTokenName as the next prefix
-            
+
       const nestedResults = flattenTokens(nextPrefix, tokenObj[key]);
 
       // If the object has a "_" property, use its value for the parent token
-      if (tokenObj[key].hasOwnProperty('_')) {
-        const hexColor = getColorForToken(tokenObj[key]['_']);
+      if (tokenObj[key].hasOwnProperty("_")) {
+        const hexColor = getColorForToken(tokenObj[key]["_"]);
 
         // Define the color name here.
-        const colorName = tokenObj[key]['_'];
+        const colorName = tokenObj[key]["_"];
 
         // Avoid duplicates and avoid pushing null values
-        if (!resultTokens.some(token => token.name === nextPrefix) && hexColor !== null) {
+        if (
+          !resultTokens.some((token) => token.name === nextPrefix) &&
+          hexColor !== null
+        ) {
           resultTokens.push({
             name: nextPrefix,
             colorName: colorName,
-            value: hexColor
+            value: hexColor,
           });
         }
 
-        resultMapping[nextPrefix] = tokenObj[key]['_'];
+        resultMapping[nextPrefix] = tokenObj[key]["_"];
       }
 
       // Instead of directly concatenating, first filter out any duplicates from the nestedResults
-      nestedResults.tokens.forEach(token => {
-        if (!resultTokens.some(existingToken => existingToken.name === token.name)) {
+      nestedResults.tokens.forEach((token) => {
+        if (
+          !resultTokens.some(
+            (existingToken) => existingToken.name === token.name
+          )
+        ) {
           resultTokens.push(token);
         }
       });
-
 
       resultMapping = { ...resultMapping, ...nestedResults.mapping };
     }
@@ -181,7 +182,6 @@ function cleanColorName(name) {
 
 // Function to populate allColors array
 function populateColors(colorObj, tokenColorMap) {
-
   let resultColors = [];
 
   for (let key in colorObj) {
@@ -241,13 +241,15 @@ function populateColors(colorObj, tokenColorMap) {
   return resultColors;
 }
 
-
 // When data is loaded, flatten and put into arrays
 function processColorsAndTokens() {
   // console.log("processColorsAndTokens runs");
 
   // Run flattenTokens to process tokens and colors
-  const { tokens: tokensList, mapping: tokenColorMap } = flattenTokens("", tokens);
+  const { tokens: tokensList, mapping: tokenColorMap } = flattenTokens(
+    "",
+    tokens
+  );
 
   // Update Svelte stores
   allTokens.set(tokensList);
@@ -267,11 +269,10 @@ function processColorsAndTokens() {
 
   // Once data is processed, set the flag to true
   dataProcessed.set(true);
-
 }
 
 // Reactive logic below
-dataFetched.subscribe(value => {
+dataFetched.subscribe((value) => {
   if (value) {
     // console.log("Reactive block triggered via subscription");
     processColorsAndTokens();
