@@ -1,44 +1,58 @@
 <script>
   import "@warp-ds/elements";
-  import { onMount } from 'svelte';
-  import { get } from "svelte/store";
-  import jsyaml from "js-yaml";
-  import { slide, fade } from "svelte/transition";
-  import { quintOut } from "svelte/easing";
+  import chroma from "chroma-js";
 
-  let overlap = 128;
+  import {
+    APCAcontrast,
+    reverseAPCA,
+    sRGBtoY,
+    displayP3toY,
+    adobeRGBtoY,
+    alphaBlend,
+    calcAPCA,
+    fontLookupAPCA,
+  } from "apca-w3";
+  import { colorParsley, colorToHex, colorToRGB } from "colorparsley";
 
-  function generateRandomColor() {
-    let randomColor = "#" + Math.floor(Math.random() * 16777215).toString(16);
-    console.log("random colour", randomColor);
-    return randomColor;
-  }
+  let backgroundColor = chroma.random().hex().toUpperCase();
+  let foregroundColor =
+    chroma.contrast(backgroundColor, "white") > 4.5 ? "#FFFFFF" : "#000000";
 
-  let color = generateRandomColor();
+  // APCA modeule documentation
+  // https://www.npmjs.com/package/apca-w3
+
+  let Lc = Math.round(Math.abs(APCAcontrast(
+    sRGBtoY(colorParsley(foregroundColor)),
+    sRGBtoY(colorParsley(backgroundColor)))));
 
 </script>
 
-<div class="pt-32 pb-{overlap} px-16 top-wrapper" style="background-color: {color};">
-  <h1 class="t1 mt-16 text-center">APCA colour contrast checker</h1>
+<div
+  class="pt-32 pb-128 px-16 top-wrapper"
+  style="background-color: {backgroundColor};"
+>
+  <h1 class="t1 mt-16 text-center" style="color: {foregroundColor};">
+    APCA colour contrast checker
+  </h1>
 </div>
 
 <main>
   <div class="flex justify-center">
-    <w-box bordered={true} class="w-fit -mt-{overlap}">
+    <w-box bordered={true} class="w-fit -mt-128">
       <h2 class="t2">Choose colours</h2>
       <w-textfield
         label="Foreground colour"
-        placeholder=""
         help-text="HEX code like #111111"
         class="mt-16"
+        value={foregroundColor}
       >
       </w-textfield>
 
       <w-textfield
         label="Background colour"
-        placeholder=""
         help-text="HEX code like #efefef"
         class="mt-16"
+        value={backgroundColor}
       >
       </w-textfield>
     </w-box>
@@ -47,14 +61,18 @@
   <h2 class="t2 mt-64">Contrast for graphics</h2>
 
   <w-alert variant="info" show class="mt-16">
-    <p>Minimum size:</p>
-    <span class="t1">33</span>
-    <p>pixels</p>
+    <p>Contrast:</p>
+    <span class="t1">{Lc} Lc</span>
   </w-alert>
+  
+  <w-alert variant="info" show class="mt-16">
+    <p>Minimum size:</p>
+    <span class="t1">? pixels</span>
+  </w-alert>
+
 </main>
 
 <style>
-
   main {
     padding: 16px;
     margin: auto;
