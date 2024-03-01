@@ -33,6 +33,18 @@
   let foregroundColor =
     chroma.contrast(backgroundColor, "white") > 4.5 ? "#FFFFFF" : "#000000";
 
+  function newRandomColours() {
+    backgroundColor = chroma.random().hex().toUpperCase();
+    foregroundColor =
+    chroma.contrast(backgroundColor, "white") > 4.5 ? "#FFFFFF" : "#000000";
+  }
+
+  function swapColours() {
+    let previousBackground = backgroundColor;
+    backgroundColor = foregroundColor;
+    foregroundColor = previousBackground;
+   }
+
   let backgroundIsValid = true;
   let foregroundIsValid = true;
 
@@ -62,9 +74,9 @@
 
   // Find smallest pixel size to use if valid colours
   $: demand =
-  foregroundIsValid && backgroundIsValid
-    ? (sortedDemands.find((demand) => demand.Lc <= Lc) || { Size: "No" }).Size
-    : 100;
+    foregroundIsValid && backgroundIsValid
+      ? (sortedDemands.find((demand) => demand.Lc <= Lc) || { Size: "No" }).Size
+      : 100;
 
   function handleForegroundInput(event) {
     // check if valid colour
@@ -100,7 +112,7 @@
   <div class="flex justify-center mb-32">
     <w-box bordered={true} class="w-fit -mt-128">
       <h2 class="t3">Choose colours</h2>
-      <div class="flex flex-wrap gap-x-24 gap-y-8">
+      <div class="flex flex-wrap gap-x-24 gap-y-8 mb-24">
         <w-textfield
           label="Foreground colour"
           invalid={!foregroundIsValid}
@@ -125,6 +137,10 @@
         >
         </w-textfield>
       </div>
+      <div class="flex gap-16">
+      <w-button variant="primary" on:click={newRandomColours}>Random colours</w-button>
+      <w-button variant="secondary" on:click={swapColours}>Swap colours</w-button>
+    </div>
     </w-box>
   </div>
 
@@ -143,7 +159,7 @@
         <div class="flex gap-8">
           <span class="t1">{wcagContrast} : 1</span>
           <img
-            class="h-24 mt-10"
+            class="h-24 mt-8"
             src="/colour-tokens-overview/green_check.svg"
             alt="Green check"
           />
@@ -152,7 +168,7 @@
         <div class="flex gap-8">
           <span class="t1">{wcagContrast} : 1</span>
           <img
-            class="h-24 mt-10"
+            class="h-24 mt-8"
             src="/colour-tokens-overview/red_cross.svg"
             alt="Red cross"
           />
@@ -169,7 +185,7 @@
   </div>
 
   <!-- Table -->
-  <table class="table-auto my-32 w-full md:w-3/4" >
+  <table class="table-auto my-32 w-full md:w-3/4">
     <thead>
       <tr>
         <th class="text-right">Size</th>
@@ -186,16 +202,16 @@
           <!-- LC demand -->
           <td class="text-right pr-16">{item.Lc} Lc</td>
           <!-- APCA -->
-          <td class="flex justify-center items-center pr-8">
+          <td class="flex justify-center items-center pr-8 py-16">
             {#if Lc < item.Lc}
               <img
-                class="h-24 mt-10"
+                class="h-24 "
                 src="/colour-tokens-overview/red_cross.svg"
                 alt="Red cross"
               />
             {:else}
               <img
-                class="h-24 mt-10"
+                class="h-24 "
                 src="/colour-tokens-overview/green_check.svg"
                 alt="Green check"
               />
@@ -217,7 +233,10 @@
       {/each}
     </tbody>
   </table>
-  <p>Built using <a href="https://www.npmjs.com/package/apca-w3">APCA-3</a>, <a href="https://www.npmjs.com/package/chroma-js">Chroma.js</a>.</p>
+  <p>
+    Built using <a href="https://www.npmjs.com/package/apca-w3">APCA-3</a>,
+    <a href="https://www.npmjs.com/package/chroma-js">Chroma.js</a>.
+  </p>
 </main>
 
 <style>
@@ -249,5 +268,4 @@
     padding-top: 12px;
     padding-bottom: 12px;
   }
-
 </style>
