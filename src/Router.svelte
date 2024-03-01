@@ -1,8 +1,8 @@
 <!-- src/Router.svelte -->
 <script>
   import Colours from "./pages/Colours.svelte";
-  import Contrast from "./pages/Contrast.svelte";
-  import Apca from "./pages/Apca.svelte";
+  import Contrast from "./pages/textContrast.svelte";
+  import Apca from "./pages/graphicsContrast.svelte";
   import NotFound from "./pages/NotFound.svelte"; // A new 404 page component
   import { onMount, onDestroy } from "svelte";
 
@@ -36,13 +36,13 @@
   >
   <a
   class="p-8 rounded-4"
-    class:selected_page={currentRoute === '/contrast.html'}
-    href="#/contrast.html">Contrast</a
+    class:selected_page={currentRoute === '/textcontrast.html'}
+    href="#/textcontrast.html">Text contrast</a
   >
   <a
   class="p-8 rounded-4"
-    class:selected_page={currentRoute === '/apca.html'}
-    href="#/apca.html">APCA</a
+    class:selected_page={currentRoute === '/graphicscontrast.html'}
+    href="#/graphicscontrast.html">Non-text contrast</a
   >
 
 </nav>
@@ -50,10 +50,10 @@
 
 {#if currentRoute === "/colours.html"}
   <Colours />
-{:else if currentRoute === "/contrast.html"}
+{:else if currentRoute === "/textcontrast.html"}
   <Contrast />
 
-  {:else if currentRoute === "/apca.html"}
+  {:else if currentRoute === "/graphicscontrast.html"}
   <Apca />
 {:else}
   <NotFound />

@@ -48,6 +48,7 @@
     foregroundIsValid && backgroundIsValid
       ? Math.round(
           Math.abs(
+            // @ts-ignore
             APCAcontrast(
               sRGBtoY(colorParsley(foregroundColor)),
               sRGBtoY(colorParsley(backgroundColor))
