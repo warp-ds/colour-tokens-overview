@@ -36,14 +36,14 @@
   function newRandomColours() {
     backgroundColor = chroma.random().hex().toUpperCase();
     foregroundColor =
-    chroma.contrast(backgroundColor, "white") > 4.5 ? "#FFFFFF" : "#000000";
+      chroma.contrast(backgroundColor, "white") > 4.5 ? "#FFFFFF" : "#000000";
   }
 
   function swapColours() {
     let previousBackground = backgroundColor;
     backgroundColor = foregroundColor;
     foregroundColor = previousBackground;
-   }
+  }
 
   let backgroundIsValid = true;
   let foregroundIsValid = true;
@@ -138,9 +138,13 @@
         </w-textfield>
       </div>
       <div class="flex gap-16">
-      <w-button variant="primary" on:click={newRandomColours}>Random colours</w-button>
-      <w-button variant="secondary" on:click={swapColours}>Swap colours</w-button>
-    </div>
+        <w-button variant="primary" on:click={newRandomColours}
+          >Random colours</w-button
+        >
+        <w-button variant="secondary" on:click={swapColours}
+          >Swap colours</w-button
+        >
+      </div>
     </w-box>
   </div>
 
@@ -205,13 +209,13 @@
           <td class="flex justify-center items-center pr-8 py-16">
             {#if Lc < item.Lc}
               <img
-                class="h-24 "
+                class="h-24"
                 src="/colour-tokens-overview/red_cross.svg"
                 alt="Red cross"
               />
             {:else}
               <img
-                class="h-24 "
+                class="h-24"
                 src="/colour-tokens-overview/green_check.svg"
                 alt="Green check"
               />
@@ -234,7 +238,18 @@
     </tbody>
   </table>
   <p>
-    Built using <a href="https://www.npmjs.com/package/apca-w3">APCA-3</a>,
+    The <a href="https://git.apcacontrast.com/documentation/APCAeasyIntro"
+    >Advanced Perceptual Contrast Algorithm (APCA)</a> measures lightness
+    contrast as a value from Lc 0 (not contrast) to Lc 106 (maximum contrast).
+    <br> <br>
+    APCA™ is the candidate contrast method for WCAG 3, and is currently in
+    public beta. WCAG 3 is still in development and subject to changes prior to
+    adoption.
+    <br> <br>
+
+    This page was built using <a href="https://www.npmjs.com/package/apca-w3">APCA-3</a>,
+    <a href="https://warp-ds.github.io/tech-docs/">WARP</a>,
+    <a href="https://svelte.dev/">Svelte</a>, and
     <a href="https://www.npmjs.com/package/chroma-js">Chroma.js</a>.
   </p>
 </main>

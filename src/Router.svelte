@@ -34,11 +34,13 @@
     class:selected_page={currentRoute === '/colours.html'}
     href="#/colours.html">Colours in WARP</a
   >
+  <!-- 
   <a
   class="p-8 rounded-4"
     class:selected_page={currentRoute === '/textcontrast.html'}
     href="#/textcontrast.html">Text contrast</a
   >
+   -->
   <a
   class="p-8 rounded-4"
     class:selected_page={currentRoute === '/graphicscontrast.html'}

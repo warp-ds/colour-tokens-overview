@@ -1,4 +1,5 @@
 // json-two.html?f=000000&b=ffffff
+// Code from https://colorcontrast.dev/api/
 
 var foregroundHex;
 var backgroundHex;
