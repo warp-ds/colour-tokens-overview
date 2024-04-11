@@ -89,11 +89,14 @@
 
   <w-alert class="my-24" variant="warning" show="">
     <p class="font-bold">Use colour classes with purpose</p>
-    <p>For example, a "-hover" class should only be used for hover states. If you can't find a relevant class,
-      ask your designer if the colour should be changed, or reach out to the Warp team on Slack:
+    <p>
+      For example, a "-hover" class should only be used for hover states. If you
+      can't find a relevant class, ask your designer if the colour should be
+      changed, or reach out to the Warp team on Slack:
       <a href="https://sch-chat.slack.com/archives/C04P0GYTHPV"
         >#nmp-warp-design-system</a
-      >.</p>
+      >.
+    </p>
   </w-alert>
 
   <p>
@@ -102,7 +105,6 @@
     colour. Currently this page only includes the FINN light theme.
   </p>
 
-  
   <div style="height: 60px;" class="my-16">
     <w-button
       role="button"
@@ -225,5 +227,10 @@
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease;
+  }
+
+  a {
+    text-decoration: underline;
+    text-decoration-style: dotted;
   }
 </style>

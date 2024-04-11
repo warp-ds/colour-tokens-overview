@@ -283,4 +283,9 @@
     padding-top: 12px;
     padding-bottom: 12px;
   }
+
+  a {
+    text-decoration: underline;
+    text-decoration-style: dotted;
+  }
 </style>

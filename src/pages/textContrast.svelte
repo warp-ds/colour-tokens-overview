@@ -320,4 +320,9 @@
   label {
     vertical-align: middle;
   }
+
+  a {
+    text-decoration: underline;
+    text-decoration-style: dotted;
+  }
 </style>
