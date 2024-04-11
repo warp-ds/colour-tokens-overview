@@ -239,15 +239,29 @@
   </table>
   <p>
     The <a href="https://git.apcacontrast.com/documentation/APCAeasyIntro"
-    >Advanced Perceptual Contrast Algorithm (APCA)</a> measures lightness
-    contrast as a value from Lc 0 (not contrast) to Lc 106 (maximum contrast).
-    <br> <br>
-    APCA™ is the candidate contrast method for WCAG 3, and is currently in
-    public beta. WCAG 3 is still in development and subject to changes prior to
-    adoption.
-    <br> <br>
+      >Advanced Perceptual Contrast Algorithm (APCA)</a
+    >
+    measures lightness contrast as a value from Lc 0 (no contrast) to Lc 106
+    (maximum contrast).
+    <br /> <br />
+    APCA™ is the candidate contrast method for WCAG 3, and is currently in public
+    beta. WCAG 3 is still in development and subject to changes prior to adoption.   
+    <br /> <br />
+    For text there are several APCA contrast checkers available:
+    <a
+      href="https://www.achecks.org/apca-wcag-3-accessible-colour-contrast-checker/"
+      >achecks</a
+    >, <a href="https://contrast.tools/">contrast.tools</a> and
+    <a href="https://www.myndex.com/APCA/">myndex</a>. In Figma, you can use
+    the plugin
+    <a href="https://www.figma.com/community/plugin/748533339900865323/contrast"
+      >Contrast</a
+    >
+    to check APCA contrast. 
+    <br /> <br />
 
-    This page was built using <a href="https://www.npmjs.com/package/apca-w3">APCA-3</a>,
+    This page was built using
+    <a href="https://www.npmjs.com/package/apca-w3">APCA-3</a>,
     <a href="https://warp-ds.github.io/tech-docs/">WARP</a>,
     <a href="https://svelte.dev/">Svelte</a>, and
     <a href="https://www.npmjs.com/package/chroma-js">Chroma.js</a>.
