@@ -1,25 +1,6 @@
 <script>
   // @ts-nocheck
 
-  import { onMount } from "svelte";
-
-  // tracking
-  onMount(() => {
-    const script = document.createElement("script");
-    script.src = "//zgo.at/count.js";
-    script.async = true;
-    script.dataset.goatcounter = "https://warp.goatcounter.com/count";
-    script.dataset.goatcounterSettings = JSON.stringify({
-      path: "/textContrast",
-    });
-
-    document.head.appendChild(script);
-
-    return () => {
-      document.head.removeChild(script);
-    };
-  });
-
   import "@warp-ds/elements";
   // import { APCAcontrast, APCAcontrastFromHex } from 'apca-w3/src/apca-w3.js';
   import {
