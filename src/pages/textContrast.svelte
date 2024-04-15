@@ -1,6 +1,25 @@
 <script>
   // @ts-nocheck
 
+  import { onMount } from "svelte";
+
+  // tracking
+  onMount(() => {
+    const script = document.createElement("script");
+    script.src = "//zgo.at/count.js";
+    script.async = true;
+    script.dataset.goatcounter = "https://warp.goatcounter.com/count";
+    script.dataset.goatcounterSettings = JSON.stringify({
+      path: "/textContrast",
+    });
+
+    document.head.appendChild(script);
+
+    return () => {
+      document.head.removeChild(script);
+    };
+  });
+
   import "@warp-ds/elements";
   // import { APCAcontrast, APCAcontrastFromHex } from 'apca-w3/src/apca-w3.js';
   import {
@@ -98,8 +117,9 @@
     >.
   </p>
   <p>
-    <a href="https://www.myndex.com/APCA/">APCA contrast</a> (WCAG 3.0) takes font size and weight into consideration. For example, APCA L<sup>c</sup> contrast for normal,
-    non-bold text:
+    <a href="https://www.myndex.com/APCA/">APCA contrast</a> (WCAG 3.0) takes
+    font size and weight into consideration. For example, APCA L<sup>c</sup> contrast
+    for normal, non-bold text:
   </p>
   <ul>
     <li>L<sup>c</sup> 100: 15px or larger</li>
@@ -237,7 +257,7 @@
                             colorForeground,
                             colorBackground
                           );
-                          return Math.abs(Math.round(contrastValue ) );
+                          return Math.abs(Math.round(contrastValue));
                         })()}
                       </p>
                     </td>

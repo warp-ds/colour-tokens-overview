@@ -1,6 +1,21 @@
 <!-- src/pages/NotFound.svelte -->
 <script>
-  // You can add some logic here if needed
+  import { onMount } from "svelte";
+
+  // tracking
+  onMount(() => {
+    const script = document.createElement("script");
+    script.src = "//zgo.at/count.js";
+    script.async = true;
+    script.dataset.goatcounter = "https://warp.goatcounter.com/count";
+    script.dataset.goatcounterSettings = JSON.stringify({ path: "/404" });
+
+    document.head.appendChild(script);
+
+    return () => {
+      document.head.removeChild(script);
+    };
+  });
 </script>
 
 <div>
