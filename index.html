@@ -3,14 +3,46 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/warp-logo-small.svg" />
-    <link rel="stylesheet" href="https://assets.finn.no/pkg/@warp-ds/fonts/v1/finn-no.css"/>
-    <link rel="stylesheet" href="https://assets.finn.no/pkg/@warp-ds/css/v1/tokens/finn-no.css"/>
-    <link rel=“stylesheet” href=“https://assets.finn.no/pkg/@warp-ds/css/v1/resets.css” />
+    <link
+      rel="stylesheet"
+      href="https://assets.finn.no/pkg/@warp-ds/fonts/v1/finn-no.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://assets.finn.no/pkg/@warp-ds/css/v1/tokens/finn-no.css"
+    />
+    <link rel=“stylesheet”
+    href=“https://assets.finn.no/pkg/@warp-ds/css/v1/resets.css” />
     <title>Colour Tokens in WARP</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
   <body>
     <div id="app"></div>
+
+    <script
+      data-goatcounter="https://warp.goatcounter.com/count"
+      async
+      src="//gc.zgo.at/count.js"
+    ></script>
+
+    <script>
+      window.addEventListener('load', () => {
+        const updatePath = () => {
+          const path = location.hash ? location.hash.slice(1) : '/'; // Remove the '#' and use as path
+          window.goatcounter = {
+            path: path,
+            // You can add other GoatCounter settings here
+          };
+        };
+    
+        // Update path on initial load
+        updatePath();
+    
+        // Update path whenever the hash changes
+        window.addEventListener('hashchange', updatePath, false);
+      });
+    </script>
+
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
