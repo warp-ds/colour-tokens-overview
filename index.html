@@ -26,20 +26,30 @@
     ></script>
 
     <script>
-      window.addEventListener('load', () => {
-        const updatePath = () => {
-          const path = location.hash ? location.hash.slice(1) : '/'; // Remove the '#' and use as path
-          window.goatcounter = {
+      window.addEventListener("load", () => {
+        const updateGoatCounterSettings = () => {
+          const path = location.hash ? location.hash.slice(1) : "/"; // Remove the '#' and use as path
+          const settings = {
             path: path,
-            // You can add other GoatCounter settings here
+            // Optionally, add other properties like title or referrer if needed
+            title: document.title,
+            referrer: document.referrer,
           };
+
+          const goatCounterScript = document.querySelector(
+            "script[data-goatcounter]"
+          );
+          goatCounterScript.setAttribute(
+            "data-goatcounter-settings",
+            JSON.stringify(settings)
+          );
         };
-    
-        // Update path on initial load
-        updatePath();
-    
-        // Update path whenever the hash changes
-        window.addEventListener('hashchange', updatePath, false);
+
+        // Update settings on initial load
+        updateGoatCounterSettings();
+
+        // Update settings whenever the hash changes
+        window.addEventListener("hashchange", updateGoatCounterSettings, false);
       });
     </script>
 
