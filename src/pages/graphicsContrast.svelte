@@ -247,7 +247,13 @@
     <br /> <br />
     APCA™ is the candidate contrast method for WCAG 3, and is currently in public
     beta. WCAG 3 is still in development and subject to changes prior to adoption.
-    <br /> <br />
+    <br /> 
+    <br /> 
+    The contrast requirements above are extracted from 
+    <a href="https://github.com/Myndex/SAPC-APCA/discussions/39">the Non-Text Minimums table (image)</a> from Myndex, marked "Preliminary – Feb 2, 2022".
+     
+    <br /> 
+    <br />
     For text there are several APCA contrast checkers available:
     <a
       href="https://www.achecks.org/apca-wcag-3-accessible-colour-contrast-checker/"
