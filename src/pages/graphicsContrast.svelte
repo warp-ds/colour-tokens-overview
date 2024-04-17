@@ -238,34 +238,35 @@
       {/each}
     </tbody>
   </table>
-  <p>
+  <h2 class="t2 mb-16 mt-24">About APCA contrast</h2>
+  <p class="w-full pb-8">
     The <a href="https://git.apcacontrast.com/documentation/APCAeasyIntro"
       >Advanced Perceptual Contrast Algorithm (APCA)</a
     >
     measures lightness contrast as a value from Lc 0 (no contrast) to Lc 106 (maximum
     contrast).
-    <br /> <br />
+  </p><p class="w-full pb-8">
     APCA™ is the candidate contrast method for WCAG 3, and is currently in public
     beta. WCAG 3 is still in development and subject to changes prior to adoption.
-    <br /> 
-    <br /> 
+  </p><p class="w-full pb-8">
     The contrast requirements above are extracted from 
     <a href="https://github.com/Myndex/SAPC-APCA/discussions/39">the Non-Text Minimums table (image)</a> from Myndex, marked "Preliminary – Feb 2, 2022".
      
-    <br /> 
-    <br />
+  </p><p class="w-full pb-8">
     For text there are several APCA contrast checkers available:
     <a
       href="https://www.achecks.org/apca-wcag-3-accessible-colour-contrast-checker/"
       >achecks</a
     >, <a href="https://contrast.tools/">contrast.tools</a> and
-    <a href="https://www.myndex.com/APCA/">myndex</a>. In Figma, you can use the
-    plugin
+    <a href="https://www.myndex.com/APCA/">myndex</a>. In Figma, you can for example use the
+    plugins
     <a href="https://www.figma.com/community/plugin/748533339900865323/contrast"
       >Contrast</a
-    >
-    to check APCA contrast.
-    <br /> <br />
+    > or <a href="https://www.figma.com/community/plugin/1281280685402026529/polychrome"
+      >Polychrome</a> to check APCA contrast.
+    </p>
+    
+    <p class="w-full pb-8">
 
     This page was built using
     <a href="https://www.npmjs.com/package/apca-w3">APCA-3</a>,
