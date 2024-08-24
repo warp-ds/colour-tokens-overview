@@ -106,6 +106,8 @@
     colour. Currently this page only includes the FINN light theme.
   </p>
 
+  <p>Because of some changes in the token files, all colours/tokens are not listed here. We are working on fixing this!</p>
+
   <div style="height: 60px;" class="my-16">
     <w-button
       role="button"
