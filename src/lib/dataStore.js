@@ -2,7 +2,6 @@
 
 // src/lib/dataStore.js
 import { writable, get } from "svelte/store";
-import jsyaml from "js-yaml";
 
 // Raw data
 let colors = null;
@@ -15,7 +14,6 @@ export const tokenColorMapping = writable({});
 
 // Flag to check if data has been fetched
 export const dataFetched = writable(false);
-// export let dataFetched = false;
 
 // Flag to check if data has been processed
 export const dataProcessed = writable(false);
@@ -28,60 +26,56 @@ export async function fetchTokens() {
 
     // Fetch and parse the colors YAML
     const colorsResponse = await fetch(
-      "https://raw.githubusercontent.com/warp-ds/css/next/tokens/finn.no/colors.yml"
+      "https://raw.githubusercontent.com/warp-ds/tokens/main/tokens/finn-light/colors.json"
     );
-    const colorsYaml = await colorsResponse.text();
-    colors = jsyaml.load(colorsYaml);
+    colors = await colorsResponse.json(); // Parse JSON directly
 
     // Fetch and parse the tokens YAML
     const tokensResponse = await fetch(
-      "https://raw.githubusercontent.com/warp-ds/css/next/tokens/finn.no/semantic.yml"
+      "https://raw.githubusercontent.com/warp-ds/tokens/main/tokens/finn-light/semantic.json"
     );
-    const tokensYaml = await tokensResponse.text();
-    tokens = jsyaml.load(tokensYaml);
+    tokens = await tokensResponse.json(); // Parse JSON directly
+
+    console.log("Data fetched. Colors and tokens:")
+    console.log(colors, tokens);
+    // console.log("Example color:", colors["color"]["gray"]["200"]);
 
     // Once data is fetched, set the flag to true
     dataFetched.set(true);
-
-    // console.log("Data fetched. Colors and tokens:")
-    // console.log(colors, tokens);
   }
 }
 
 // Function to get the hex code for a primitive token
 function getColorForToken(token) {
-  // Check for the special cases: 'white' and 'black'
-  if (token === "white") return "#ffffff";
-  if (token === "black") return "#000000";
+  const parts = token.split(".");
+  const colorFamily = "color";  // The top-level key in your colors.json
 
-  const parts = token.split("-");
-  if (parts.length === 2) {
+  if (parts.length === 1) {
+    // Handle single-level color references like "white"
+    if (colors[colorFamily] && colors[colorFamily][token]) {
+      return colors[colorFamily][token];
+    } else if (colors[token]) {
+      return colors[token];
+    } else {
+      console.warn(`Color not found for token: ${token}`);
+    }
+  } else if (parts.length === 2) {
+    // Handle multi-level color references like "gray.200"
     const colorName = parts[0];
     const shade = parts[1];
-    if (colors[colorName] && colors[colorName][shade]) {
-      // Check if the color shade is a string (hex color)
-      if (typeof colors[colorName][shade] === "string") {
-        return colors[colorName][shade];
-      }
-      // If it's an object, return the default "_" value
-      else if (colors[colorName][shade]["_"]) {
-        return colors[colorName][shade]["_"];
-      }
+    if (colors[colorFamily] && colors[colorFamily][colorName] && colors[colorFamily][colorName][shade]) {
+      return colors[colorFamily][colorName][shade];
+    } else {
+      console.warn(`Color not found for token: ${colorName}.${shade}`);
     }
-  } else if (parts.length === 3) {
-    const colorName = parts[0];
-    const shade = parts[1];
-    const variant = parts[2];
-    if (
-      colors[colorName] &&
-      colors[colorName][shade] &&
-      colors[colorName][shade][variant]
-    ) {
-      return colors[colorName][shade][variant];
-    }
+  } else {
+    console.log(`Invalid token format: ${token}`);
   }
-  return null; // or return some default color if desired
+  return null;  // Return null if color is not found
 }
+
+
+
 
 // Function to flatten the semantic tokens
 function flattenTokens(prefix, tokenObj) {
@@ -89,90 +83,39 @@ function flattenTokens(prefix, tokenObj) {
   let resultMapping = {};
 
   for (let key in tokenObj) {
-    // Exclude 'token: maps' from the list
-    if (key === "token" && tokenObj[key] === "maps") {
-      continue;
-    }
-
     let fullTokenName = prefix ? `${prefix}-${key}` : key;
 
-    // Remove "color-" from the token name
-    fullTokenName = fullTokenName.replace(/^s-color-/, "s-");
+    if (typeof tokenObj[key] === "object" && "value" in tokenObj[key]) {
+      // Match color reference like "{color.gray.200}"
+      const colorReferenceMatch = tokenObj[key]["value"].match(/\{color\.(.*?)\}/);
+      if (colorReferenceMatch) {
+        const colorReference = colorReferenceMatch[1];  // e.g., "gray.200"
+        const hexColor = getColorForToken(colorReference);
 
-    // Rename "s-background-" to "s-bg-" in the token name
-    fullTokenName = fullTokenName.replace(/^s-background/, "s-bg");
-
-    // if string value
-    if (typeof tokenObj[key] === "string") {
-      // Remove trailing "-_"
-      if (fullTokenName.endsWith("-_")) {
-        fullTokenName = fullTokenName.substring(0, fullTokenName.length - 2);
-      }
-
-      const hexColor = getColorForToken(tokenObj[key]);
-
-      // Define the color name
-      const colorName = tokenObj[key];
-
-      // Avoid duplicates and avoid pushing null values
-      if (
-        !resultTokens.some((token) => token.name === fullTokenName) &&
-        hexColor !== null
-      ) {
-        resultTokens.push({
-          name: fullTokenName,
-          colorName: colorName,
-          value: hexColor,
-        });
-      }
-
-      resultMapping[fullTokenName] = tokenObj[key];
-    }
-    // If more nested stuff
-    else if (typeof tokenObj[key] === "object") {
-      const nextPrefix = fullTokenName; // Use the already cleaned fullTokenName as the next prefix
-
-      const nestedResults = flattenTokens(nextPrefix, tokenObj[key]);
-
-      // If the object has a "_" property, use its value for the parent token
-      if (tokenObj[key].hasOwnProperty("_")) {
-        const hexColor = getColorForToken(tokenObj[key]["_"]);
-
-        // Define the color name here.
-        const colorName = tokenObj[key]["_"];
-
-        // Avoid duplicates and avoid pushing null values
-        if (
-          !resultTokens.some((token) => token.name === nextPrefix) &&
-          hexColor !== null
-        ) {
+        if (hexColor) {
           resultTokens.push({
-            name: nextPrefix,
-            colorName: colorName,
+            name: fullTokenName,
+            colorName: colorReference,
             value: hexColor,
           });
+        } else {
+          console.log(`Failed to find hex color for reference: ${colorReference}`);
         }
 
-        resultMapping[nextPrefix] = tokenObj[key]["_"];
+        resultMapping[fullTokenName] = colorReference;
+      } else {
+        console.log(`No color reference found in value: ${tokenObj[key]["value"]}`);
       }
-
-      // Instead of directly concatenating, first filter out any duplicates from the nestedResults
-      nestedResults.tokens.forEach((token) => {
-        if (
-          !resultTokens.some(
-            (existingToken) => existingToken.name === token.name
-          )
-        ) {
-          resultTokens.push(token);
-        }
-      });
-
+    } else if (typeof tokenObj[key] === "object") {
+      const nestedResults = flattenTokens(fullTokenName, tokenObj[key]);
+      resultTokens = resultTokens.concat(nestedResults.tokens);
       resultMapping = { ...resultMapping, ...nestedResults.mapping };
     }
   }
 
   return { tokens: resultTokens, mapping: resultMapping };
 }
+
 
 // Utility to remove '-_' suffix if present
 // Can skip?
@@ -183,98 +126,65 @@ function cleanColorName(name) {
 // Function to populate allColors array
 function populateColors(colorObj, tokenColorMap) {
   let resultColors = [];
+  const colorFamily = "color";  // Assuming all colors are nested under "color"
 
-  for (let key in colorObj) {
-    // Exclude unwanted colors
-    if (["token", "transparent", "inherit", "none"].includes(key)) continue;
-
-    if (typeof colorObj[key] === "string") {
-      resultColors.push({
-        name: cleanColorName(key),
-        value: colorObj[key],
-        count: 0, // default value
-      });
-    } else if (typeof colorObj[key] === "object") {
-      for (let shade in colorObj[key]) {
-        if (typeof colorObj[key][shade] === "string") {
-          resultColors.push({
-            name: cleanColorName(`${key}-${shade}`),
-            value: colorObj[key][shade],
-            count: 0, // default value
-          });
-        } else {
-          // Handle nested shades if necessary
-          // Only store the value associated with the '_' key
-          if (colorObj[key][shade]["_"]) {
-            resultColors.push({
-              name: cleanColorName(`${key}-${shade}`),
-              value: colorObj[key][shade]["_"],
-              count: 0, // default value
-            });
-          }
-        }
+  for (let colorName in colorObj[colorFamily]) {
+    const shades = colorObj[colorFamily][colorName];
+    for (let shade in shades) {
+      if (typeof shades[shade] === "string") {
+        resultColors.push({
+          name: `${colorName}.${shade}`,
+          value: shades[shade],
+          count: 0,
+        });
+      } else if (typeof shades[shade] === "object" && "value" in shades[shade]) {
+        resultColors.push({
+          name: `${colorName}.${shade}`,
+          value: shades[shade]["value"],
+          count: 0,
+        });
       }
     }
   }
 
-  // Count how many semantic tokens refer to a given colour
-  function countTokensForColor(colorName, tokenColorMap) {
-    // console.log("Checking color name:", colorName);
-    let count = 0;
-    for (let token in tokenColorMap) {
-      if (tokenColorMap[token] === colorName) {
-        count++;
-      }
-    }
-    // console.log("coun: ", count);
-    return count;
-  }
-
-  // when the colours are in place, count how many times they are used by semantic tokens
+  // Count how many semantic tokens refer to each color
   resultColors.forEach((color) => {
-    color.count = countTokensForColor(color.name, tokenColorMap);
+    color.count = Object.values(tokenColorMap).filter(
+      (tokenColor) => tokenColor === color.name
+    ).length;
   });
-
-  // console.log("Token-Color Mapping:", tokenColorMapping);
-  // console.log("Result Colors:", resultColors);
 
   return resultColors;
 }
 
+
 // When data is loaded, flatten and put into arrays
 function processColorsAndTokens() {
-  // console.log("processColorsAndTokens runs");
+  if (get(dataFetched) && !get(dataProcessed)) {
+    const { tokens: tokensList, mapping: tokenColorMap } = flattenTokens("", tokens);
 
-  // Run flattenTokens to process tokens and colors
-  const { tokens: tokensList, mapping: tokenColorMap } = flattenTokens(
-    "",
-    tokens
-  );
+    allTokens.set(tokensList);
+    tokenColorMapping.set(tokenColorMap);
 
-  // Update Svelte stores
-  allTokens.set(tokensList);
-  tokenColorMapping.set(tokenColorMap);
+    const colorsList = populateColors(colors, tokenColorMap);
+    allColors.set(colorsList);
 
-  // Run populateColors
-  const colorsList = populateColors(colors, tokenColorMap);
-
-  // Update Svelte store for colors
-  allColors.set(colorsList);
-
-  // console.log("tokensList", tokensList);
-  // console.log("colorsList", colorsList);
-
-  // console.log("tokenColorMap", tokenColorMap);
-  // console.log("tokenColorMapping", tokenColorMapping);
-
-  // Once data is processed, set the flag to true
-  dataProcessed.set(true);
+    dataProcessed.set(true);
+  }
 }
 
 // Reactive logic below
 dataFetched.subscribe((value) => {
   if (value) {
-    // console.log("Reactive block triggered via subscription");
     processColorsAndTokens();
   }
 });
+
+(async () => {
+  await fetchTokens();
+  processColorsAndTokens();
+
+  console.log("All Tokens:", get(allTokens));
+  console.log("All Colors:", get(allColors));
+  console.log("Token-Color Mapping:", get(tokenColorMapping));
+})();
